@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-<!--
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <!--
 
 Replace the strings "YourUserId" and "YourGitHubUser" in this file
 accordingly
 
 -->
-
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>joy</artifactId>
@@ -17,15 +14,13 @@ accordingly
   <groupId>edu.pdx.cs.joy.YourUserId</groupId>
   <artifactId>JoyOfCoding</artifactId>
   <version>1.0.0</version>
-
   <packaging>pom</packaging>
   <name>JoyOfCodingWinter2026</name>
   <description>Source code written in the Winter 2026 offering of The Joy of Coding</description>
   <url>http://YourGitHubUserInLowerCase.github.io/JoyOfCodingWinter2026</url>
-
   <modules>
+    <module>koans</module>
   </modules>
-
   <inceptionYear>2026</inceptionYear>
   <organization>
     <name>Portland State University</name>
@@ -56,7 +51,6 @@ accordingly
       <timezone>-7</timezone>
     </developer>
   </developers>
-
   <repositories>
     <repository>
       <name>Central Portal Snapshots</name>
@@ -70,7 +64,6 @@ accordingly
       </snapshots>
     </repository>
   </repositories>
-
   <build>
     <plugins>
       <plugin>
@@ -90,7 +83,6 @@ accordingly
       </plugin>
     </plugins>
   </build>
-
   <scm>
     <connection>scm:git:git@github.com:YourGithubUser/JoyOfCodingWinter2026.git</connection>
   </scm>
@@ -105,5 +97,4 @@ accordingly
       <url>scm:git:git@github.com:YourGithubUser/JoyOfCodingWinter2026.git</url>
     </site>
   </distributionManagement>
-
 </project>

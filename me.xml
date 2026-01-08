@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE student PUBLIC "-//Joy of Coding at PSU//DTD Grade Book//EN" "http://www.cs.pdx.edu/~whitlock/dtds/gradebook.dtd">
+<student enrolled-section="undergraduate">
+<id>jayabe</id>
+<firstName>Jay</firstName>
+<lastName>Abegglen</lastName>
+<nickName>Jay</nickName>
+<email>jayabe@pdx.edu</email>
+<major>Computer Science</major>
+<github-user-name>jayabe-maker</github-user-name>
+<notes>
+<note>Jay "Jay" Abegglen would like to learn Solidify my Java knowledge and expand on industry fundementals.</note>
+<note>Jay "Jay" Abegglen has these comments: I' was a software engineering intern at CDK Global last summer, and am interested in joining PCEP. Do you have any points of advice for that? Also I have accomedations through DRC and joined the class late (as of 2 hours ago)</note>
+</notes>
+</student>
