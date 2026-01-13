@@ -9,44 +9,46 @@ public class AboutPrimitives {
 
     @Koan
     public void wholeNumbersAreOfTypeInt() {
-        assertEquals(getType(1), __); // hint: int.class
+        assertEquals(getType(1), int.class); // hint: int.class
+        // this is not a object type. this is for runtime performance for C++/C programmers and is used to
+        // keep things highly efficient, however as we got further into the language, the Capital versions
+        // are there to represent class object versions of those prims
     }
 
     @Koan
     public void primitivesOfTypeIntHaveAnObjectTypeInteger() {
         Object number = 1;
-        assertEquals(getType(number), __);
-
+        assertEquals(getType(number), Integer.class);
         // Primitives can be automatically changed into their object type via a process called auto-boxing
         // We will explore this in more detail in intermediate.AboutAutoboxing
     }
 
     @Koan
     public void integersHaveAFairlyLargeRange() {
-        assertEquals(Integer.MIN_VALUE, __);
-        assertEquals(Integer.MAX_VALUE, __);
+        assertEquals(Integer.MIN_VALUE, -2147483648);
+        assertEquals(Integer.MAX_VALUE, 2147483647);
     }
 
     @Koan
     public void integerSize() {
-        assertEquals(Integer.SIZE, __);  // This is the amount of bits used to store an int
+        assertEquals(Integer.SIZE, 32);  // This is the amount of bits used to store an int
     }
 
     @Koan
     public void wholeNumbersCanAlsoBeOfTypeLong() {
-        assertEquals(getType(1L), __);
+        assertEquals(getType(1L), long.class);
     }
 
     @Koan
     public void primitivesOfTypeLongHaveAnObjectTypeLong() {
         Object number = 1L;
-        assertEquals(getType(number), __);
+        assertEquals(getType(number), Long.class);
     }
 
     @Koan
     public void longsHaveALargerRangeThanInts() {
-        assertEquals(Long.MIN_VALUE, __);
-        assertEquals(Long.MAX_VALUE, __);
+        assertEquals(Long.MIN_VALUE, -9223372036854775807L -1);
+        assertEquals(Long.MAX_VALUE, 2147483647);
     }
 
     @Koan
