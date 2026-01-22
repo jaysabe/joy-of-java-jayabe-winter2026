@@ -31,7 +31,7 @@ public class Student extends Human {
    */
   @Override
   public String says() {
-    throw new UnsupportedOperationException("Not implemented yet");
+    return "This class is too much work";
   }
 
   /**
@@ -39,7 +39,7 @@ public class Student extends Human {
    * <code>Student</code>.
    */
   public String toString() {
-    throw new UnsupportedOperationException("Not implemented yet");
+    return this.getName();
   }
 
   /**

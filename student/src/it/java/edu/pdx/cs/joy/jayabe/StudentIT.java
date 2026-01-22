@@ -4,6 +4,7 @@ import edu.pdx.cs.joy.InvokeMainTestCase;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 
 /**
@@ -19,4 +20,28 @@ class StudentIT extends InvokeMainTestCase {
     assertThat(result.getTextWrittenToStandardError(), containsString("Missing required student information"));
   }
 
+  @Test
+  void jayStudentIsWrittenToStandardOut () {
+    InvokeMainTestCase.MainMethodResult result = invokeMain(Student.class);
+    assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("This is a student"));
+  }
+
+
+  @Test
+  void studentNameIsWrittenToStandardOut () {
+    String name = "Student";
+    InvokeMainTestCase.MainMethodResult result = invokeMain(Student.class, name, "other", "0.0");
+    assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("This is a student"));
+  }
+
+
+  @Test
+  void studentGPAIsWrittenToStandardOut () {
+    String gpa = "2.0";
+    InvokeMainTestCase.MainMethodResult result = invokeMain(Student.class, "Any name", gpa);
+    assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+    assertThat(result.getTextWrittenToStandardOut(), containsString(" has gpa of " + gpa));
+  }
 }

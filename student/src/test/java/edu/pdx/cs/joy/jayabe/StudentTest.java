@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
@@ -22,4 +23,34 @@ public class StudentTest
     assertThat(pat.getName(), equalTo(name));
   }
 
+  private static Student createStudentNamed (String name) {
+    return new Student(name, new ArrayList<>(), 0.0, "Doesn't matter");
+  }
+
+  void says() {
+    var student = new createStudentNamed("Jay");
+    assertThat(student.says(), equalTo("This class is too much work"));
+  }
+
+  @Test
+  void jayStudent() {
+    classes.add("Algorithms");
+    classes.add("Operating Systems");
+    classes.add("Algorithms");
+    Student jay = new Student("Jay", classes, 3.65, "male");
+  }
+
+  @Test
+  void toStringContainsStudentNamed() {
+    String name = "Jay";
+    Student student = createStudentNamed(name);
+    assertThat(student.toString(), containsString(name));
+  }
+
+  @Test
+  void toStringContainsGPA() {
+    double gpa = 3.65;
+    Student student = createStudentNamed("Jay");
+    assertThat(student.toString(), containsString(String.valueOf(gpa)));
+  }
 }
