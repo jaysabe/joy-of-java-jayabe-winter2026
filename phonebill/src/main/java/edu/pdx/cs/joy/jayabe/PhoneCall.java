@@ -3,23 +3,69 @@ package edu.pdx.cs.joy.jayabe;
 import edu.pdx.cs.joy.AbstractPhoneCall;
 
 public class PhoneCall extends AbstractPhoneCall {
+  private final String customer;
+  private final String callerNumber;
+  private final String calleeNumber;
+  private final String begin;
+  private final String end;
+
+  /**
+   * Creates a new phone call
+   * @param customer The customer making the call (can contain any characters including numbers)
+   * @param callerNumber The phone number of the person initiating the call
+   * @param calleeNumber The phone number of the person receiving the call
+   * @param begin The date and time when the call began (formatted as a string, e.g., "01/15/2025 10:30 AM")
+   * @param end The date and time when the call ended (formatted as a string, e.g., "01/15/2025 10:45 AM")
+   */
+  public PhoneCall(String customer, String callerNumber, String calleeNumber, String begin, String end) {
+    this.customer = customer;
+    this.callerNumber = callerNumber;
+    this.calleeNumber = calleeNumber;
+    this.begin = begin;
+    this.end = end;
+  }
+
+  /**
+   * Returns the phone number of the person who initiated this call
+   * @return The caller's phone number
+   */
   @Override
   public String getCaller() {
-    throw new UnsupportedOperationException("This method is not implemented yet");
+    return this.callerNumber;
   }
 
+  /**
+   * Returns the phone number of the person who received this call
+   * @return The callee's phone number
+   */
   @Override
   public String getCallee() {
-    return "This method is not implemented yet";
+    return this.calleeNumber;
   }
 
+  /**
+   * Returns the date and time when this call began
+   * @return A string representation of when the call began
+   */
   @Override
   public String getBeginTimeString() {
-    throw new UnsupportedOperationException("This method is not implemented yet");
+    return this.begin;
   }
 
+  /**
+   * Returns the date and time when this call ended
+   * @return A string representation of when the call ended
+   */
   @Override
   public String getEndTimeString() {
-    throw new UnsupportedOperationException("This method is not implemented yet");
+    return this.end;
+  }
+
+  /**
+   * Returns the customer name
+   * @return The customer's name
+   */
+  public String getCustomer() {
+    return this.customer;
   }
 }
