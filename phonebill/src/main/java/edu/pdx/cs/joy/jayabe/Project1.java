@@ -9,6 +9,7 @@ public class Project1 {
   private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
   private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
   private static final String[] errors = {
+          "Missing phone bill information",
           "Missing customer name",
           "Missing caller phone number",
           "Missing callee phone number",
@@ -17,6 +18,10 @@ public class Project1 {
           "Missing end date",
           "Missing end time"
   };
+
+  /**
+   * Constant for setting
+   * */
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
           DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
@@ -37,6 +42,7 @@ public class Project1 {
     List<String> arguments = new ArrayList<>();
 
     if (args.length == 0) {
+      System.out.println(errors[0]);
       printUsage();
       return;
     }
@@ -111,6 +117,8 @@ public class Project1 {
     if (print) {
       System.out.println(call);
     }
+
+
   }
 
 

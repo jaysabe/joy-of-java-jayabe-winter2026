@@ -4,6 +4,9 @@ import edu.pdx.cs.joy.AbstractPhoneBill;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * PhoneBill Class defines a collection of phone calls per customer
+ * */
 public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
   private final String customer;
   private final Collection<PhoneCall> phonesCalls;
@@ -13,6 +16,9 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
     this.phonesCalls = new ArrayList<>();
   }
 
+  /**
+   * gets Customer name
+   * */
   @Override
   public String getCustomer() {
     return this.customer;
@@ -20,7 +26,7 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
 
   /**
    * Adds a phone call to this customer's phone bill
-   * @param creates and inserts a phone call
+   * @param call creates and inserts a phone call
    * */
   @Override
   public void addPhoneCall(PhoneCall call) {
