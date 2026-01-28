@@ -9,8 +9,7 @@ public class Project1 {
   private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
   private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
   private static final String[] errors = {
-          "Missing phone bill information",
-          "Missing customer name",
+          "Missing customer information",
           "Missing caller phone number",
           "Missing callee phone number",
           "Missing begin date",
@@ -42,7 +41,7 @@ public class Project1 {
     List<String> arguments = new ArrayList<>();
 
     if (args.length == 0) {
-      System.out.println(errors[0]);
+      System.err.println(errors[0]);
       printUsage();
       return;
     }
@@ -83,12 +82,12 @@ public class Project1 {
     }
 
     int argCount = arguments.size();
-    if (argCount < errors.length) {
+    if (argCount < 8) {
       System.err.println("Error: " + errors[argCount]);
       printUsage();
       return;
-    } else if (argCount > errors.length) {
-      System.err.println("Error: Too many command line arguments");
+    } else if (argCount > 8) {
+      System.err.println("Too many command line arguments");
       printUsage();
       return;
     }
