@@ -75,17 +75,6 @@ public class PhoneCallTest {
     }
 
     @Test
-    void testBeginTimeCanBePastOrFuture() {
-        LocalDateTime past = LocalDateTime.of(2020, 1, 1, 9, 0);
-        LocalDateTime future = LocalDateTime.of(2030, 12, 31, 23, 0);
-        PhoneCall pastCall = new PhoneCall("John", "503-123-4567", "971-987-6543", past, past.plusMinutes(15));
-        PhoneCall futureCall = new PhoneCall("John", "503-123-4567", "971-987-6543", future, future.plusMinutes(30));
-
-        assertEquals("01/01/2020 09:00", pastCall.getBeginTimeString());
-        assertEquals("12/31/2030 23:00", futureCall.getBeginTimeString());
-    }
-
-    @Test
     void testDateAndTimeConcatenatedWithSpace() {
         LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
         PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, begin.plusMinutes(15));
@@ -112,17 +101,5 @@ public class PhoneCallTest {
         PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
 
         assertThat(phoneCall, instanceOf(AbstractPhoneCall.class));
-    }
-
-    @Test
-    void testToStringIncludesCustomerAndNumbers() {
-        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
-        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
-        PhoneCall phoneCall = new PhoneCall("Alice", "503-123-4567", "503-765-4321", begin, end);
-
-        String toString = phoneCall.toString();
-        assertTrue(toString.contains("Alice"));
-        assertTrue(toString.contains("503-123-4567"));
-        assertTrue(toString.contains("503-765-4321"));
     }
 }

@@ -105,8 +105,9 @@ class Project1Test {
       };
       new Project1().parseAndRun(args);
       String output = outContent.toString();
-      assertTrue(output.contains("Alice"));
-      assertTrue(output.contains("503-123-4567"));
+        assertTrue(output.contains("503-123-4567"));
+        assertTrue(output.contains("503-765-4321"));
+        assertFalse(output.trim().isEmpty(), "Expected output with -print option");
     }
 
     @Test

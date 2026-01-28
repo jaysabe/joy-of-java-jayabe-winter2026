@@ -12,7 +12,7 @@ public class PhoneCall extends AbstractPhoneCall {
   private final LocalDateTime begin;
   private final LocalDateTime end;
 
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
   /**
    * Creates a new phone call
