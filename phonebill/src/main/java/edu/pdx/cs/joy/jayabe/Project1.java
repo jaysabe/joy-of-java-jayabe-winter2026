@@ -1,20 +1,14 @@
 package edu.pdx.cs.joy.jayabe;
-
-import edu.pdx.cs.joy.jayabe.PhoneBill;
-import edu.pdx.cs.joy.jayabe.PhoneCall;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class Project1 {
-
-  private static final Pattern PHONE_PATTERN =
-          Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
-
-  private static final Pattern TIME_PATTERN =
-          Pattern.compile("\\d{1,2}:\\d{2}");
-
-  private static final  String[] errors = {
+  private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
+  private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
+  private static final String[] errors = {
           "Missing customer name",
           "Missing caller phone number",
           "Missing callee phone number",
@@ -23,6 +17,8 @@ public class Project1 {
           "Missing end date",
           "Missing end time"
   };
+  private static final DateTimeFormatter DATE_TIME_FORMATTER =
+          DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
   public static void main(String[] args) {
     try {
@@ -34,31 +30,44 @@ public class Project1 {
     }
   }
 
-  private void parseAndRun(String[] args) {
+  void parseAndRun(String[] args) {
     boolean customerArg = false;
     boolean print = false;
     boolean readme = false;
     List<String> arguments = new ArrayList<>();
 
-    //if empty cli
     if (args.length == 0) {
       printUsage();
       return;
     }
 
-    // Parse options first
-    for (String arg : args) {
+    for (int i = 0; i < args.length; i++) {
+      String arg = args[i];
+
       if (!customerArg && arg.startsWith("-")) {
-        if (arg.equals("-print")) {
-          print = true;
-        } else if (arg.equals("-README")) {
-          readme = true;
-        } else {
-          throw new IllegalArgumentException("Unknown option: " + arg);
-        }
+        if (arg.equals("-print")) print = true;
+        else if (arg.equals("-README")) readme = true;
+        else throw new IllegalArgumentException("Unknown option: " + arg);
       } else {
         customerArg = true;
-        arguments.add(arg);
+        // Handle quoted customer
+        if (arg.startsWith("\"")) {
+          StringBuilder sb = new StringBuilder();
+          sb.append(arg.substring(1)); // remove starting quote
+          while (!arg.endsWith("\"") && i + 1 < args.length) {
+            i++;
+            arg = args[i];
+            sb.append(" ").append(arg);
+          }
+          // remove trailing quote
+          String customer = sb.toString();
+          if (customer.endsWith("\"")) {
+            customer = customer.substring(0, customer.length() - 1);
+          }
+          arguments.add(customer);
+        } else {
+          arguments.add(arg);
+        }
       }
     }
 
@@ -68,7 +77,6 @@ public class Project1 {
     }
 
     int argCount = arguments.size();
-
     if (argCount < errors.length) {
       System.err.println("Error: " + errors[argCount]);
       printUsage();
@@ -78,7 +86,6 @@ public class Project1 {
       printUsage();
       return;
     }
-
 
     String customer = arguments.get(0);
     String callerNumber = arguments.get(1);
@@ -93,11 +100,11 @@ public class Project1 {
     validateTime(beginTime, "begin time");
     validateTime(endTime, "end time");
 
-    PhoneCall call =
-            new PhoneCall(customer, callerNumber, calleeNumber,
-                    beginDate + " " + beginTime,
-                    endDate + " " + endTime);
+    // Parse strings to LocalDateTime
+    LocalDateTime begin = LocalDateTime.parse(beginDate + " " + beginTime, DATE_TIME_FORMATTER);
+    LocalDateTime end = LocalDateTime.parse(endDate + " " + endTime, DATE_TIME_FORMATTER);
 
+    PhoneCall call = new PhoneCall(customer, callerNumber, calleeNumber, begin, end);
     PhoneBill bill = new PhoneBill(customer);
     bill.addPhoneCall(call);
 
@@ -106,11 +113,11 @@ public class Project1 {
     }
   }
 
+
   private static void validatePhoneNumber(String number, String field) {
     if (!PHONE_PATTERN.matcher(number).matches()) {
       throw new IllegalArgumentException(
-              "Invalid " + field + " format: " + number +
-                      " (expected nnn-nnn-nnnn)"
+              "Invalid " + field + " format: " + number + " (expected nnn-nnn-nnnn)"
       );
     }
   }
@@ -118,8 +125,7 @@ public class Project1 {
   private static void validateTime(String time, String field) {
     if (!TIME_PATTERN.matcher(time).matches()) {
       throw new IllegalArgumentException(
-              "Invalid " + field + " format: " + time +
-                      " (expected hh:mm)"
+              "Invalid " + field + " format: " + time + " (expected hh:mm)"
       );
     }
   }

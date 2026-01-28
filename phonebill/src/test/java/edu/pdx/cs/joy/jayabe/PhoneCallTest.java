@@ -1,224 +1,128 @@
 package edu.pdx.cs.joy.jayabe;
 
+import edu.pdx.cs.joy.AbstractPhoneCall;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for the {@link PhoneCall} class.
+ * Unit tests for the {@link PhoneCall} class (TDD style)
  */
 public class PhoneCallTest {
 
-    /**
-     * Test that constructor creates a valid PhoneCall object
-     */
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
+
     @Test
     void testPhoneCallConstructorCreatesValidObject() {
-        String customer = "John Smith";
-        String callerNumber = "503-123-4567";
-        String calleeNumber = "971-987-6543";
-        String begin = "01/15/2025 10:30 AM";
-        String end = "01/15/2025 10:45 AM";
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
 
-        PhoneCall phoneCall = new PhoneCall(customer, callerNumber, calleeNumber, begin, end);
+        PhoneCall phoneCall = new PhoneCall("John Smith", "503-123-4567", "971-987-6543", begin, end);
 
         assertNotNull(phoneCall);
         assertThat(phoneCall, instanceOf(PhoneCall.class));
     }
 
-    /**
-     * Test that customer name can contain numbers
-     */
     @Test
     void testCustomerNameCanContainNumbers() {
-        String customer = "Customer123";
-        PhoneCall phoneCall = new PhoneCall(customer, "503-123-4567", "971-987-6543",
-                "01/15/2025 10:30 AM", "01/15/2025 10:45 AM");
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("Customer123", "503-123-4567", "971-987-6543", begin, end);
 
-        assertEquals(customer, phoneCall.getCustomer());
+        assertEquals("Customer123", phoneCall.getCustomer());
     }
 
-    /**
-     * Test that customer name can contain special characters
-     */
     @Test
     void testCustomerNameCanContainSpecialCharacters() {
-        String customer = "John O'Brien-Smith Jr.";
-        PhoneCall phoneCall = new PhoneCall(customer, "503-123-4567", "971-987-6543",
-                "01/15/2025 10:30 AM", "01/15/2025 10:45 AM");
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("John O'Brien-Smith Jr.", "503-123-4567", "971-987-6543", begin, end);
 
-        assertEquals(customer, phoneCall.getCustomer());
+        assertEquals("John O'Brien-Smith Jr.", phoneCall.getCustomer());
     }
 
-    /**
-     * Test that getCaller returns the correct phone number
-     */
     @Test
     void testGetCallerReturnsCorrectNumber() {
-        String callerNumber = "503-123-4567";
-        PhoneCall phoneCall = new PhoneCall("John", callerNumber, "971-987-6543",
-                "01/15/2025 10:30 AM", "01/15/2025 10:45 AM");
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
 
-        assertEquals(callerNumber, phoneCall.getCaller());
+        assertEquals("503-123-4567", phoneCall.getCaller());
     }
 
-    /**
-     * Test that getCallee returns the correct phone number
-     */
     @Test
     void testGetCalleeReturnsCorrectNumber() {
-        String calleeNumber = "971-987-6543";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", calleeNumber,
-                "01/15/2025 10:30 AM", "01/15/2025 10:45 AM");
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
 
-        assertEquals(calleeNumber, phoneCall.getCallee());
+        assertEquals("971-987-6543", phoneCall.getCallee());
     }
 
-    /**
-     * Test that getBeginTimeString returns the correct begin time
-     */
     @Test
-    void testGetBeginTimeStringReturnsCorrectTime() {
-        String begin = "01/15/2025 10:30 AM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543",
-                begin, "01/15/2025 10:45 AM");
+    void testGetBeginAndEndTimeStrings() {
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
 
-        assertEquals(begin, phoneCall.getBeginTimeString());
+        assertEquals("01/15/2025 10:30", phoneCall.getBeginTimeString());
+        assertEquals("01/15/2025 10:45", phoneCall.getEndTimeString());
     }
 
-    /**
-     * Test that getEndTimeString returns the correct end time
-     */
     @Test
-    void testGetEndTimeStringReturnsCorrectTime() {
-        String end = "01/15/2025 10:45 AM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543",
-                "01/15/2025 10:30 AM", end);
+    void testBeginTimeCanBePastOrFuture() {
+        LocalDateTime past = LocalDateTime.of(2020, 1, 1, 9, 0);
+        LocalDateTime future = LocalDateTime.of(2030, 12, 31, 23, 0);
+        PhoneCall pastCall = new PhoneCall("John", "503-123-4567", "971-987-6543", past, past.plusMinutes(15));
+        PhoneCall futureCall = new PhoneCall("John", "503-123-4567", "971-987-6543", future, future.plusMinutes(30));
 
-        assertEquals(end, phoneCall.getEndTimeString());
+        assertEquals("01/01/2020 09:00", pastCall.getBeginTimeString());
+        assertEquals("12/31/2030 23:00", futureCall.getBeginTimeString());
     }
 
-    /**
-     * Test that begin time can be a past date/time
-     */
-    @Test
-    void testBeginTimeCanBePastDateTime() {
-        String pastBegin = "01/01/2020 9:00 AM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543",
-                pastBegin, "01/01/2020 9:15 AM");
-
-        assertEquals(pastBegin, phoneCall.getBeginTimeString());
-    }
-
-    /**
-     * Test that begin time can be a future date/time
-     */
-    @Test
-    void testBeginTimeCanBeFutureDateTime() {
-        String futureBegin = "12/31/2030 11:00 PM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543",
-                futureBegin, "12/31/2030 11:30 PM");
-
-        assertEquals(futureBegin, phoneCall.getBeginTimeString());
-    }
-
-    /**
-     * Test that date and time are properly concatenated with space
-     */
     @Test
     void testDateAndTimeConcatenatedWithSpace() {
-        String begin = "01/15/2025 10:30 AM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543",
-                begin, "01/15/2025 10:45 AM");
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, begin.plusMinutes(15));
 
-        assertThat(phoneCall.getBeginTimeString(), containsString(" "));
-        String[] parts = phoneCall.getBeginTimeString().split(" ");
-        assertTrue(parts.length >= 2); // At least date and time
+        assertTrue(phoneCall.getBeginTimeString().contains(" "));
     }
 
-    /**
-     * Test PhoneCall with all valid parameters
-     */
-    @Test
-    void testPhoneCallWithAllValidParameters() {
-        String customer = "Jane Doe";
-        String callerNumber = "503-555-1234";
-        String calleeNumber = "971-555-5678";
-        String begin = "03/20/2025 2:15 PM";
-        String end = "03/20/2025 2:45 PM";
-
-        PhoneCall phoneCall = new PhoneCall(customer, callerNumber, calleeNumber, begin, end);
-
-        assertEquals(customer, phoneCall.getCustomer());
-        assertEquals(callerNumber, phoneCall.getCaller());
-        assertEquals(calleeNumber, phoneCall.getCallee());
-        assertEquals(begin, phoneCall.getBeginTimeString());
-        assertEquals(end, phoneCall.getEndTimeString());
-    }
-
-    /**
-     * Test that PhoneCall extends AbstractPhoneCall
-     */
-    @Test
-    void testPhoneCallExtendsAbstractPhoneCall() {
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543",
-                "01/15/2025 10:30 AM", "01/15/2025 10:45 AM");
-
-        assertThat(phoneCall, instanceOf(edu.pdx.cs.joy.AbstractPhoneCall.class));
-    }
-
-    /**
-     * Test with different time formats (12-hour format)
-     */
-    @Test
-    void testWith12HourTimeFormat() {
-        String begin = "01/15/2025 1:30 PM";
-        String end = "01/15/2025 2:00 PM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
-
-        assertEquals(begin, phoneCall.getBeginTimeString());
-        assertEquals(end, phoneCall.getEndTimeString());
-    }
-
-    /**
-     * Test with midnight time
-     */
-    @Test
-    void testWithMidnightTime() {
-        String begin = "01/15/2025 12:00 AM";
-        String end = "01/15/2025 12:30 AM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
-
-        assertEquals(begin, phoneCall.getBeginTimeString());
-    }
-
-    /**
-     * Test with noon time
-     */
-    @Test
-    void testWithNoonTime() {
-        String begin = "01/15/2025 12:00 PM";
-        String end = "01/15/2025 12:30 PM";
-        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
-
-        assertEquals(begin, phoneCall.getBeginTimeString());
-    }
-
-    /**
-     * Test that PhoneCall fields are immutable (cannot be changed after creation)
-     */
     @Test
     void testPhoneCallFieldsAreImmutable() {
-        String originalCaller = "503-123-4567";
-        PhoneCall phoneCall = new PhoneCall("John", originalCaller, "971-987-6543",
-                "01/15/2025 10:30 AM", "01/15/2025 10:45 AM");
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
 
-        // Verify that the caller number hasn't changed
-        assertEquals(originalCaller, phoneCall.getCaller());
+        // Fields are final, cannot be modified
+        assertEquals("503-123-4567", phoneCall.getCaller());
+        assertEquals("971-987-6543", phoneCall.getCallee());
+        assertEquals("John", phoneCall.getCustomer());
+    }
 
-        // PhoneCall should remain unchanged because fields are final
-        assertThat(phoneCall.getCaller(), is(originalCaller));
+    @Test
+    void testPhoneCallExtendsAbstractPhoneCall() {
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
+
+        assertThat(phoneCall, instanceOf(AbstractPhoneCall.class));
+    }
+
+    @Test
+    void testToStringIncludesCustomerAndNumbers() {
+        LocalDateTime begin = LocalDateTime.of(2025, 1, 15, 10, 30);
+        LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+        PhoneCall phoneCall = new PhoneCall("Alice", "503-123-4567", "503-765-4321", begin, end);
+
+        String toString = phoneCall.toString();
+        assertTrue(toString.contains("Alice"));
+        assertTrue(toString.contains("503-123-4567"));
+        assertTrue(toString.contains("503-765-4321"));
     }
 }
