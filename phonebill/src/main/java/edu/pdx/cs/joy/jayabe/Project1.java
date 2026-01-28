@@ -38,7 +38,7 @@ public class Project1 {
     boolean customerArg = false;
     boolean print = false;
     boolean readme = false;
-    List<String> arguments = new ArrayList<>();
+    List<String> arguments = new ArrayList<>(7);
 
     if (args.length == 0) {
       System.err.println(errors[0]);
@@ -82,11 +82,11 @@ public class Project1 {
     }
 
     int argCount = arguments.size();
-    if (argCount < 8) {
-      System.err.println("Error: " + errors[argCount]);
+    if (argCount < 7) {
+      System.err.println(errors[argCount]);
       printUsage();
       return;
-    } else if (argCount > 8) {
+    } else if (argCount > 7){
       System.err.println("Too many command line arguments");
       printUsage();
       return;

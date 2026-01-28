@@ -81,7 +81,7 @@ class Project1Test {
               "Alice", "503-123-4567", "503-765-4321",
               "01/27/2026", "1000", "01/27/2026", "10:30"
       };
-      IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+       IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
               () -> new Project1().parseAndRun(args));
       assertTrue(ex.getMessage().contains("Invalid begin time format"));
     }
