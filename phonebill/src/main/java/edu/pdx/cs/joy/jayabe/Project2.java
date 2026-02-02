@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Project1 {
+public class Project2 {
   private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
   private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
   private static final String[] errors = {
@@ -26,7 +26,7 @@ public class Project1 {
 
   public static void main(String[] args) {
     try {
-      new Project1().parseAndRun(args);
+      new Project2().parseAndRun(args);
     } catch (IllegalArgumentException ex) {
       System.err.println("Error: " + ex.getMessage());
       System.err.println();

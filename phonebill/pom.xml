@@ -75,7 +75,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>edu.pdx.cs.joy.jayabe.Project1</mainClass>
+              <mainClass>edu.pdx.cs.joy.jayabe.Project2</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -107,6 +107,14 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${jacoco-maven-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>21</source>
+          <target>21</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>

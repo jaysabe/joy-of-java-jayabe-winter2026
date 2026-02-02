@@ -8,7 +8,7 @@ import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Project1Test {
+class Project2Test {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
@@ -28,7 +28,7 @@ class Project1Test {
     @Test
     void testMissingArguments() {
       String[] args = {};
-      new Project1().parseAndRun(args);
+      new Project2().parseAndRun(args);
       String output = outContent.toString();
       assertTrue(output.contains("usage"), "Should print usage for empty args");
     }
@@ -36,7 +36,7 @@ class Project1Test {
     @Test
     void testMissingCustomer() {
       String[] args = {"Alice", "503-123-4567"};
-      new Project1().parseAndRun(args);
+      new Project2().parseAndRun(args);
       String errOutput = errContent.toString();
       assertTrue(errOutput.contains("Missing callee phone number"));
     }
@@ -48,7 +48,7 @@ class Project1Test {
               "01/27/2026", "10:00", "01/27/2026", "10:30",
               "extraArg"
       };
-      new Project1().parseAndRun(args);
+      new Project2().parseAndRun(args);
       String errOutput = errContent.toString();
       assertTrue(errOutput.contains("Too many command line arguments"));
     }
@@ -60,7 +60,7 @@ class Project1Test {
               "01/27/2026", "10:00", "01/27/2026", "10:30"
       };
       IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-              () -> new Project1().parseAndRun(args));
+              () -> new Project2().parseAndRun(args));
       assertTrue(ex.getMessage().contains("Invalid caller number format"));
     }
 
@@ -71,7 +71,7 @@ class Project1Test {
               "01/27/2026", "10:00", "01/27/2026", "10:30"
       };
       IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-              () -> new Project1().parseAndRun(args));
+              () -> new Project2().parseAndRun(args));
       assertTrue(ex.getMessage().contains("Invalid callee number format"));
     }
 
@@ -82,7 +82,7 @@ class Project1Test {
               "01/27/2026", "1000", "01/27/2026", "10:30"
       };
        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-              () -> new Project1().parseAndRun(args));
+              () -> new Project2().parseAndRun(args));
       assertTrue(ex.getMessage().contains("Invalid begin time format"));
     }
 
@@ -93,7 +93,7 @@ class Project1Test {
               "01/27/2026", "10:00", "01/27/2026", "1030"
       };
       IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-              () -> new Project1().parseAndRun(args));
+              () -> new Project2().parseAndRun(args));
       assertTrue(ex.getMessage().contains("Invalid end time format"));
     }
 
@@ -103,7 +103,7 @@ class Project1Test {
               "-print", "Alice", "503-123-4567", "503-765-4321",
               "01/27/2026", "10:00", "01/27/2026", "10:30"
       };
-      new Project1().parseAndRun(args);
+      new Project2().parseAndRun(args);
       String output = outContent.toString();
         assertTrue(output.contains("503-123-4567"));
         assertTrue(output.contains("503-765-4321"));
@@ -113,7 +113,7 @@ class Project1Test {
     @Test
     void testREADMEOption() {
       String[] args = {"-README"};
-      new Project1().parseAndRun(args);
+      new Project2().parseAndRun(args);
       String output = outContent.toString();
       assertTrue(output.contains("Project 1: Phone Bill Application"));
     }

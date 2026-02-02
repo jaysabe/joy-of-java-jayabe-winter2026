@@ -1,7 +1,7 @@
-# Compiled class file
+# Class
 *.class
-
-# Log file
+*.vscode
+# Log
 *.log
 
 # BlueJ files
