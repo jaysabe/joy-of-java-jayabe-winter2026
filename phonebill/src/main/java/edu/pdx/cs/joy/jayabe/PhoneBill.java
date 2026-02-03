@@ -5,19 +5,42 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * PhoneBill Class defines a collection of phone calls per customer
- * */
+ * The <code>PhoneBill</code> class represents a phone bill for a specific customer.
+ * It extends {@link AbstractPhoneBill} and manages a collection of {@link PhoneCall} objects
+ * associated with a single customer.
+ *
+ * <p>Each phone bill is identified by the customer's name and maintains a list of all
+ * phone calls made by that customer. This class provides methods to retrieve the customer
+ * name, add new phone calls, and access the complete collection of calls.
+ *
+ * <p>Example usage:
+ * <pre>
+ *   PhoneBill bill = new PhoneBill("John Doe");
+ *   PhoneCall call = new PhoneCall(...);
+ *   bill.addPhoneCall(call);
+ *   Collection&lt;PhoneCall&gt; calls = bill.getPhoneCalls();
+ * </pre>
+ *
+ * @author Jay Abegglen
+ * @version 1.0
+ */
 public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
   private final String customer;
   private final Collection<PhoneCall> phonesCalls;
 
+  /**
+   * Constructs a new <code>PhoneBill</code> for the specified customer.
+   * The phone bill is initialized with an empty collection of phone calls.
+   *
+   * @param customer the name of the customer for this phone bill; must not be null
+   */
   public PhoneBill(String customer) {
     this.customer = customer;
     this.phonesCalls = new ArrayList<>();
   }
 
   /**
-   * gets Customer name
+   * @return customer
    * */
   @Override
   public String getCustomer() {
@@ -34,7 +57,7 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
   }
 
   /**
-   * Returns all of the phone calls from one customer
+   * Returns all phone calls from one customer
    * @return A collection of phone calls
    * */
   @Override

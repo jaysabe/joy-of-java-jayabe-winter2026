@@ -5,13 +5,33 @@ import edu.pdx.cs.joy.AbstractPhoneCall;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * The <code>PhoneCall</code> class represents a single phone call between two parties.
+ * It extends {@link AbstractPhoneCall} and encapsulates information about the caller,
+ * callee, customer, and the start and end times of the call.
+ *
+ * <p>Each phone call is immutable once created, with all fields marked as final.
+ * The class stores date and time information as {@link LocalDateTime} objects and
+ * provides formatted string representations using a standardized date-time format.
+ *
+ * <p>Example usage:
+ * <pre>
+ *   LocalDateTime start = LocalDateTime.of(2025, 1, 15, 10, 30);
+ *   LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
+ *   PhoneCall call = new PhoneCall("John Doe", "503-555-1234",
+ *                                   "503-555-5678", start, end);
+ *   System.out.println(call.getCaller()); // prints "503-555-1234"
+ * </pre>
+ *
+ * @author Jay Abegglen
+ * @version 1.0
+ */
 public class PhoneCall extends AbstractPhoneCall {
   private final String customer;
   private final String callerNumber;
   private final String calleeNumber;
   private final LocalDateTime begin;
   private final LocalDateTime end;
-
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
   /**
