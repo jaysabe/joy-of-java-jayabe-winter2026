@@ -7,6 +7,7 @@ import edu.pdx.cs.joy.PhoneBillParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.time.LocalDateTime;
 
 /**
  * The <code>TextParser</code> class parses a {@link PhoneBill} from a text file.
@@ -78,34 +79,41 @@ public class TextParser implements PhoneBillParser<PhoneBill> {
    */
   @Override
   public PhoneBill parse() throws ParserException {
-    try (
-      BufferedReader br = new BufferedReader(this.reader)
-    ) {
+    try (BufferedReader br = new BufferedReader(this.reader)) {
       String customer = br.readLine();
       if (customer == null || customer.isBlank()) {
-        throw new ParserException(("The text file is empty or missing the customer name."));
+        throw new ParserException("The text file is empty or missing the customer name.");
       }
 
       PhoneBill bill = new PhoneBill(customer);
-
-      String line = null;
+      String line;
       while ((line = br.readLine()) != null) {
         if (line.isBlank()) continue;
 
-        // Split the line based on the format used in TextDumper
-        String [] parts = line.split(",");
+        String[] parts = line.split(",");
         if (parts.length != 4) {
-          throw new ParserException(("Malformatted line in text file: " + line));
+          throw new ParserException("Malformatted line in text file (expected 4 fields): " + line);
         }
 
         try {
-          PhoneCall call = new PhoneCall(parts[0], parts[1], parts[2], parts[3], parts[4]);
+          // Extract fields from the CSV line
+          String caller = parts[0];
+          String callee = parts[1];
+
+          // Parse strings into LocalDateTime objects
+          LocalDateTime begin = LocalDateTime.parse(parts[2], Project2.DATE_TIME_FORMATTER);
+          LocalDateTime end = LocalDateTime.parse(parts[3], Project2.DATE_TIME_FORMATTER);
+
+          // Pass the customer name and the parsed dates to the constructor
+          PhoneCall call = new PhoneCall(customer, caller, callee, begin, end);
           bill.addPhoneCall(call);
+
+        } catch (java.time.format.DateTimeParseException e) {
+          throw new ParserException("Invalid date/time format in file. Expected MM/dd/yyyy HH:mm: " + e.getParsedString());
         } catch (IllegalArgumentException e) {
           throw new ParserException("Invalid call data in file: " + e.getMessage());
         }
       }
-
       return bill;
 
     } catch (IOException e) {

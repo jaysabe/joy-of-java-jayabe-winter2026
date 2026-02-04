@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 public class Project2 {
   private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
   private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
-  private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+  private static final Pattern DATE_PATTERN = Pattern.compile("\\d{1,2}/\\d{1,2}/\\d{4}");
   private static final String[] errors = {
           "Missing customer information",
           "Missing caller phone number",
@@ -49,7 +49,7 @@ public class Project2 {
    * Date and time formatter for parsing date-time strings in the format MM/dd/yyyy HH:mm.
    * Used to convert string representations of dates and times into LocalDateTime objects.
    */
-  private static final DateTimeFormatter DATE_TIME_FORMATTER =
+  static final DateTimeFormatter DATE_TIME_FORMATTER =
           DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
   /**
@@ -216,7 +216,7 @@ public class Project2 {
   private static void validateDate(String date, String field) {
     if (!DATE_PATTERN.matcher(date).matches()) {
       throw new IllegalArgumentException(
-              "Invalid " + field + " format: " + date + " (expected dd-mm-yyyy)"
+              "Invalid " + field + " format: " + date + " (expected mm-dd-yyyy)"
       );
     }
   }
