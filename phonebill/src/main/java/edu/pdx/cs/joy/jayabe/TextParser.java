@@ -101,8 +101,8 @@ public class TextParser implements PhoneBillParser<PhoneBill> {
           String callee = parts[1];
 
           // Parse strings into LocalDateTime objects
-          LocalDateTime begin = LocalDateTime.parse(parts[2], Project2.DATE_TIME_FORMATTER);
-          LocalDateTime end = LocalDateTime.parse(parts[3], Project2.DATE_TIME_FORMATTER);
+          LocalDateTime begin = LocalDateTime.parse(parts[2], Project3.DATE_TIME_FORMATTER);
+          LocalDateTime end = LocalDateTime.parse(parts[3], Project3.DATE_TIME_FORMATTER);
 
           // Pass the customer name and the parsed dates to the constructor
           PhoneCall call = new PhoneCall(customer, caller, callee, begin, end);

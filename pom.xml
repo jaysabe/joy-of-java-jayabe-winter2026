@@ -99,4 +99,5 @@ accordingly
       <url>scm:git:git@github.com:YourGithubUser/JoyOfCodingWinter2026.git</url>
     </site>
   </distributionManagement>
+  <mainClass>edu.pdx.cs.joy.[your-login-id].Project2</mainClass>
 </project>

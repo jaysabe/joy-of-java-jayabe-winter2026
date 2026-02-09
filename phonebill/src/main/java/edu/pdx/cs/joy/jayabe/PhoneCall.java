@@ -27,10 +27,25 @@ import java.time.format.DateTimeFormatter;
  * @version 1.0
  */
 public class PhoneCall extends AbstractPhoneCall {
+  /**
+   * The name of the customer involved in this phone call.
+   */
   private final String customer;
+  /**
+   * The phone number of the person who initiated the call.
+   */
   private final String callerNumber;
+  /**
+   * The phone number of the person who received the call.
+   */
   private final String calleeNumber;
+  /**
+   * The date and time when the phone call began.
+   */
   private final LocalDateTime begin;
+  /**
+   * The date and time when the phone call ended.
+   */
   private final LocalDateTime end;
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
@@ -51,8 +66,9 @@ public class PhoneCall extends AbstractPhoneCall {
   }
 
   /**
-   * Returns the customer name
-   * @return The customer's name
+   * Returns the customer name for this phone call.
+   * 
+   * @return the customer's name
    */
   public String getCustomer() {
     return this.customer;

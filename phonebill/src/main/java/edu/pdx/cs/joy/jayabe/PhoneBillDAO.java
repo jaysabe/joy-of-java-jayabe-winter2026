@@ -81,6 +81,13 @@ public class PhoneBillDAO {
     return null;
   }
 
+  /**
+   * The main entry point for the PhoneBillDAO class.
+   * This method facilitates database operations for phone bill records.
+   *
+   * @param args command-line arguments
+   * @throws SQLException if a database access error occurs
+   */
   public static void main(String[] args) throws SQLException {
     if (args.length < 2) {
       System.err.println("Usage: java PhoneBillDAO <db-file> <customer-name>");

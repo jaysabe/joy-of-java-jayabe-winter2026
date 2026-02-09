@@ -25,8 +25,12 @@ import java.util.Collection;
  * @version 1.0
  */
 public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
+  /** The name of the customer */
   private final String customer;
-  private final Collection<PhoneCall> phonesCalls;
+  /**
+   * A collection of phone calls associated with this customer's bill.
+   */
+  private final Collection<PhoneCall> phoneCalls;
 
   /**
    * Constructs a new <code>PhoneBill</code> for the specified customer.
@@ -36,7 +40,7 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
    */
   public PhoneBill(String customer) {
     this.customer = customer;
-    this.phonesCalls = new ArrayList<>();
+    this.phoneCalls = new ArrayList<>();
   }
 
   /**
@@ -53,7 +57,7 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
    * */
   @Override
   public void addPhoneCall(PhoneCall call) {
-    this.phonesCalls.add(call);
+    this.phoneCalls.add(call);
   }
 
   /**
@@ -62,7 +66,7 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
    * */
   @Override
   public Collection<PhoneCall> getPhoneCalls() {
-    return this.phonesCalls;
+    return this.phoneCalls;
   }
 
 

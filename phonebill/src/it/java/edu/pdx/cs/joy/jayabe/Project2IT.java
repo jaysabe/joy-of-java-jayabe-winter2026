@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-class Project2IT extends InvokeMainTestCase {
+class Project3IT extends InvokeMainTestCase {
 
     private MainMethodResult invokeMain(String... args) {
-        return invokeMain(Project2.class, args);
+        return invokeMain(Project3.class, args);
     }
 
     @Test
@@ -96,4 +96,32 @@ class Project2IT extends InvokeMainTestCase {
                 containsString("missing end time")
         );
     }
+
+    @Test
+    void testPrintOptionOutputsNewCall() {
+        MainMethodResult result = invokeMain(
+                "-print", "Alice", "123-456-7890", "234-567-8901",
+                "01/01/2026", "09:00", "01/01/2026", "10:00"
+        );
+        assertThat(result.getTextWrittenToStandardOut(), containsString("Phone call from 123-456-7890 to 234-567-8901"));
+    }
+
+    @Test
+    void testCustomerNameMismatchInFile(@org.junit.jupiter.api.io.TempDir java.io.File tempDir) throws java.io.IOException {
+        java.io.File file = new java.io.File(tempDir, "mismatch.txt");
+
+        // Manually create a file for "Alice"
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(file))) {
+            pw.println("Alice");
+        }
+
+        // Attempt to run the program for "Bob" using Alice's file
+        MainMethodResult result = invokeMain("-textFile", file.getAbsolutePath(), "Bob",
+                "123-456-7890", "234-567-8901",
+                "01/01/2026", "09:00", "01/01/2026", "10:00");
+
+        assertThat(result.getTextWrittenToStandardError(), containsString("does not match command line"));
+    }
+
+
 }
