@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  * @author Jay Abegglen
  * @version 1.0
  */
-public class Project3 {
+public class Project2 {
   private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
   private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
   private static final Pattern DATE_PATTERN = Pattern.compile("\\d{1,2}/\\d{1,2}/\\d{4}");
@@ -53,7 +53,7 @@ public class Project3 {
    * This constructor is used to initialize the application logic
    * for parsing and running the phone bill program.
    */
-  Project3 () {
+  Project2 () {
     //empty constructor
   }
   /**
@@ -73,7 +73,7 @@ public class Project3 {
    */
   public static void main(String... args) {
     try {
-      new Project3().parseAndRun(args);
+      new Project2().parseAndRun(args);
     } catch (IllegalArgumentException ex) {
       System.err.println("Error: " + ex.getMessage());
       System.err.println();
@@ -157,11 +157,11 @@ public class Project3 {
     }
 
     int argCount = arguments.size();
-    if (argCount < 7) {
-      System.err.println(errors[argCount]);
+    if (argCount < 5) {
+      System.err.println(errors[Math.min(argCount, errors.length - 1)]);
       printUsage();
       return;
-    } else if (argCount > 7){
+    } else if (argCount > 5){
       System.err.println("Too many command line arguments");
       printUsage();
       return;
@@ -170,28 +170,28 @@ public class Project3 {
     String customer = arguments.get(0);
     String callerNumber = arguments.get(1);
     String calleeNumber = arguments.get(2);
-    String beginDate = arguments.get(3);
-    String beginTime = arguments.get(4);
-    String endDate = arguments.get(5);
-    String endTime = arguments.get(6);
+    String beginDateTime = arguments.get(3);
+    String endDateTime = arguments.get(4);
 
     validatePhoneNumber(callerNumber, "caller number");
     validatePhoneNumber(calleeNumber, "callee number");
-    validateTime(beginTime, "begin time");
-    validateTime(endTime, "end time");
-    validateDate(beginDate, "begin date");
-    validateDate(endDate, "end date");
+    validateDateTime(beginDateTime, "begin");
+    validateDateTime(endDateTime, "end");
 
     // Parse strings to LocalDateTime
-    LocalDateTime begin = LocalDateTime.parse(beginDate + " " + beginTime, DATE_TIME_FORMATTER);
-    LocalDateTime end = LocalDateTime.parse(endDate + " " + endTime, DATE_TIME_FORMATTER);
+    LocalDateTime begin = LocalDateTime.parse(beginDateTime, DATE_TIME_FORMATTER);
+    LocalDateTime end = LocalDateTime.parse(endDateTime, DATE_TIME_FORMATTER);
     
-    // new PhoneBill logic inits
     PhoneCall newCall = new PhoneCall(customer, callerNumber, calleeNumber, begin, end);
     PhoneBill bill = new PhoneBill(customer);
 
     if (textFileFlag) {
-      bill = handleTextFile(textFileName, customer);
+      try {
+        bill = handleTextFile(textFileName, customer);
+      } catch (IllegalArgumentException e) {
+        System.err.println("Error: " + e.getMessage());
+        return;
+      }
     }
     bill.addPhoneCall(newCall);
 
@@ -199,13 +199,19 @@ public class Project3 {
       System.out.println(newCall);
     }
 
-    saveData(textFileName, bill);
+    if (textFileFlag) {
+      try {
+        saveData(textFileName, bill);
+      } catch (IllegalArgumentException e) {
+        System.err.println("Error: " + e.getMessage());
+      }
+    }
   }
 
   /**
    * Siloed helper function to handle the creation or loading of a PhoneBill.
-   * This manages file existence checks and customer name validation. [cite: 25, 37]
-   * * @param fileName The name of the file to load, or null if no file specified.
+   * This manages file existence checks and customer name validation.
+   * @param fileName The name of the file to load, or null if no file specified.
    * @param expectedCustomer The customer name provided via command line.
    * @return A PhoneBill object (either loaded from file or newly created).
    */
@@ -216,14 +222,13 @@ public class Project3 {
 
     File file = new File(fileName);
     if (!file.exists()) {
-      return new PhoneBill(expectedCustomer); // Create new if file missing [cite: 25]
+      return new PhoneBill(expectedCustomer);
     }
 
     try (Reader reader = new FileReader(file)) {
       TextParser parser = new TextParser(reader);
       PhoneBill loadedBill = parser.parse();
 
-      // Project 2 Requirement: Validate customer name match
       if (!loadedBill.getCustomer().equals(expectedCustomer)) {
         throw new IllegalArgumentException("Customer name in file (" + loadedBill.getCustomer()
                 + ") does not match command line (" + expectedCustomer + ")");
@@ -237,7 +242,7 @@ public class Project3 {
   /**
    * Siloed helper function to handle the persistence of PhoneBill data.
    * This manages the TextDumper and handles any I/O exceptions.
-   * * @param fileName The name of the file to save to; if null, no data is saved.
+   * @param fileName The name of the file to save to; if null, no data is saved.
    * @param bill The PhoneBill object to be written to the file.
    */
   private void saveData(String fileName, PhoneBill bill) {
@@ -245,13 +250,22 @@ public class Project3 {
       return;
     }
 
-    try (Writer writer = new FileWriter(fileName)) {
-      TextDumper dumper = new TextDumper(writer);
-      dumper.dump(bill);
+    try {
+      File file = new File(fileName);
+      File parentDir = file.getParentFile();
+      if (parentDir != null && !parentDir.exists()) {
+        parentDir.mkdirs();
+      }
+      
+      try (Writer writer = new FileWriter(file)) {
+        TextDumper dumper = new TextDumper(writer);
+        dumper.dump(bill);
+      }
     } catch (IOException e) {
       throw new IllegalArgumentException("Error writing to file: " + e.getMessage());
     }
   }
+
   /**
    * Validates that a phone number matches the expected format (nnn-nnn-nnnn).
    *
@@ -268,31 +282,18 @@ public class Project3 {
   }
 
   /**
-   * Validates that a time string matches the expected format (hh:mm or h:mm).
+   * Validates that a date-time string matches the expected format (mm/dd/yyyy hh:mm).
    *
-   * @param time the time string to validate
-   * @param field the descriptive name of the field being validated (e.g., "begin time")
-   * @throws IllegalArgumentException if the time does not match the expected format
+   * @param dateTime the date-time string to validate
+   * @param field the descriptive name of the field being validated (e.g., "begin")
+   * @throws IllegalArgumentException if the date-time does not match the expected format
    */
-  private static void validateTime(String time, String field) {
-    if (!TIME_PATTERN.matcher(time).matches()) {
+  private static void validateDateTime(String dateTime, String field) {
+    try {
+      LocalDateTime.parse(dateTime, DATE_TIME_FORMATTER);
+    } catch (Exception e) {
       throw new IllegalArgumentException(
-              "Invalid " + field + " format: " + time + " (expected hh:mm)"
-      );
-    }
-  }
-
-  /**
-   * Validates that a date string matches the expected format (dd-mm-yyyy).
-   *
-   * @param date the date string to validate
-   * @param field the descriptive name of the field being validated (e.g., "begin date")
-   * @throws IllegalArgumentException if the date does not match the expected format
-   */
-  private static void validateDate(String date, String field) {
-    if (!DATE_PATTERN.matcher(date).matches()) {
-      throw new IllegalArgumentException(
-              "Invalid " + field + " format: " + date + " (expected mm-dd-yyyy)"
+              "Invalid " + field + " date/time format: " + dateTime + " (expected mm/dd/yyyy hh:mm)"
       );
     }
   }
@@ -312,11 +313,11 @@ public class Project3 {
     System.out.println("  end            Date and time call ended (mm/dd/yyyy hh:mm)");
     System.out.println();
     System.out.println("options are:");
-    System.out.println("  -pretty file Pretty print the phone bill to a text file\n");
-    System.out.println("  -textFile file Where to read/write the phone bill");
-    System.out.println("  -print   Prints a description of the new phone call");
-    System.out.println("  -README  Prints a README for this project and exits");
-    System.out.println("  -textFile  Prints a text file for this project and exits");
+    System.out.println("  -pretty file     Pretty print the phone bill to a text file\n");
+    System.out.println("  -textFile file   Where to read/write the phone bill");
+    System.out.println("  -print           Prints a description of the new phone call");
+    System.out.println("  -README          Prints a README for this project and exits");
+    System.out.println("  -textFile        Prints a text file for this project and exits");
   }
 
   /**

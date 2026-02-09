@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-class Project3IT extends InvokeMainTestCase {
+class Project2IT extends InvokeMainTestCase {
 
     private MainMethodResult invokeMain(String... args) {
-        return invokeMain(Project3.class, args);
+        return invokeMain(Project2.class, args);
     }
 
     @Test

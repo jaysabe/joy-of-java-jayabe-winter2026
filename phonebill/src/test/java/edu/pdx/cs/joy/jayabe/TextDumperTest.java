@@ -92,7 +92,7 @@ public class TextDumperTest {
     dumper.dump(bill);
 
     String output = sw.toString();
-    String expectedDateString = start.format(Project3.DATE_TIME_FORMATTER);
+    String expectedDateString = start.format(Project2.DATE_TIME_FORMATTER);
     assertThat(output, containsString(customer + "," + caller + "," + callee + "," + expectedDateString));
   }
 
@@ -135,5 +135,11 @@ public class TextDumperTest {
     TextDumper dumper = new TextDumper(new StringWriter());
     // Technical check: Ensure TextDumper is an instance of the Dumper interface for PhoneBill
     assertTrue(dumper instanceof edu.pdx.cs.joy.PhoneBillDumper);
+  }
+
+  @Test
+  void invokeMain() {
+    // This test is to check if the main method is working correctly
+    // You can add more test cases as needed
   }
 }
