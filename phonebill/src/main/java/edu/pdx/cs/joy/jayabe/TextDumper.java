@@ -1,60 +1,50 @@
 package edu.pdx.cs.joy.jayabe;
 
+import edu.pdx.cs.joy.AbstractPhoneBill;
 import edu.pdx.cs.joy.PhoneBillDumper;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
-/**
- * The <code>TextDumper</code> class implements the {@link PhoneBillDumper} interface.
- * It dumps the contents of a {@link PhoneBill} to a text file, including the
- * customer name and all associated phone calls.
- *
- * @author Jay Abegglen
- * @version 1.0
- */
-public class TextDumper implements PhoneBillDumper<PhoneBill> {
-  private final Writer writer;
+public class TextDumper implements PhoneBillDumper<AbstractPhoneBill<PhoneCall>> {
 
-  /**
-   * Constructs a new <code>TextDumper</code> with the specified writer.
-   * @param writer the {@link Writer} to write phone bill data to
-   */
+  private final Writer writer;
+  private static final String DELIMITER = ",";
+  private static final DateTimeFormatter DATE_TIME_FORMATTER = 
+          DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
+
   public TextDumper(Writer writer) {
     this.writer = writer;
   }
 
-  /**
-   * Dumps the contents of a phone bill to the text-based source.
-   * The customer name is written on the first line, followed by each phone call.
-   *
-   * @param bill the {@link PhoneBill} to dump
-   * @throws IOException if an I/O error occurs while writing
-   */
   @Override
-  public void dump(PhoneBill bill) throws IOException {
+  public void dump(AbstractPhoneBill<PhoneCall> bill) throws IOException {
     if (bill == null) {
       return;
     }
-    PrintWriter pw = new PrintWriter(this.writer);
-
-    // Requirement: Write the customer name to the file
-    pw.println(bill.getCustomer());
-    // Iterate through all phone calls and write them in a comma-separated format
+    
+    // Write customer name on first line
+    writer.write(bill.getCustomer() + "\n");
+    
+    // Write each phone call
     Collection<PhoneCall> calls = bill.getPhoneCalls();
     for (PhoneCall call : calls) {
-      pw.print(call.getCustomer());
-      pw.print(",");
-      pw.print(call.getCaller());
-      pw.print(",");
-      pw.print(call.getCallee());
-      pw.print(",");
-      pw.print(call.getBeginTimeString());
-      pw.print(",");
-      pw.println(call.getEndTimeString());
+      writer.write(formatCall(call, bill.getCustomer()) + "\n");
     }
+    
+    writer.flush();
+  }
 
-    pw.flush();
+  private String formatCall(PhoneCall call, String customer) {
+    return customer + DELIMITER + 
+           call.getCaller() + DELIMITER + 
+           call.getCallee() + DELIMITER + 
+           formatDateTime(call.getBeginTime()) + DELIMITER + 
+           formatDateTime(call.getEndTime());
+  }
+
+  private String formatDateTime(LocalDateTime dateTime) {
+    return dateTime.format(DATE_TIME_FORMATTER);
   }
 }

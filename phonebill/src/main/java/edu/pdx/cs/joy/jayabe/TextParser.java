@@ -1,123 +1,69 @@
 package edu.pdx.cs.joy.jayabe;
 
-import com.google.common.annotations.VisibleForTesting;
 import edu.pdx.cs.joy.ParserException;
-import edu.pdx.cs.joy.PhoneBillParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-/**
- * The <code>TextParser</code> class parses a {@link PhoneBill} from a text file.
- * It implements the {@link PhoneBillParser} interface to read phone bill data from
- * a text-based source and reconstruct a PhoneBill object with its associated phone calls.
- *
- * <p>The expected text file format is:
- * <ul>
- *   <li>First line: Customer name</li>
- *   <li>Subsequent lines: Comma-separated phone call data with 4 fields:
- *       caller number, callee number, begin time, and end time</li>
- * </ul>
- *
- * <p>Example file format:
- * <pre>
- * John Doe
- * 503-555-1234,503-555-5678,01/15/2025 10:30,01/15/2025 10:45
- * 503-555-1234,503-555-9999,01/16/2025 14:00,01/16/2025 14:20
- * </pre>
- *
- * <p>The parser validates the file structure and phone call data, throwing
- * {@link ParserException} if the file is malformed or contains invalid data.
- *
- * @author Jay Abegglen
- * @version 1.0
- */
-public class TextParser implements PhoneBillParser<PhoneBill> {
+public class TextParser implements edu.pdx.cs.joy.PhoneBillParser<PhoneBill> {
+
   private final Reader reader;
+  private static final String DELIMITER = ",";
+  private static final DateTimeFormatter DATE_TIME_FORMATTER = 
+          DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
-  /**
-   * Constructs a new <code>TextParser</code> with the specified reader.
-   * The reader should be positioned at the beginning of the phone bill text data.
-   *
-   * @param reader the {@link Reader} to read phone bill data from; must not be null
-   */
   public TextParser(Reader reader) {
     this.reader = reader;
   }
 
-  /**
-   * Returns the reader used by this parser for reading phone bill data.
-   * This method is visible for testing purposes only.
-   *
-   * @return the {@link Reader} associated with this parser
-   */
-  @VisibleForTesting
-  public Reader getTextReader(){return this.reader; }
-
-  /**
-   * Parses and reconstructs a {@link PhoneBill} from the text source.
-   *
-   * <p>The parsing process:
-   * <ol>
-   *   <li>Reads the first line to get the customer name</li>
-   *   <li>Creates a new PhoneBill for that customer</li>
-   *   <li>Reads subsequent lines, parsing each as a phone call</li>
-   *   <li>Adds each valid phone call to the bill</li>
-   * </ol>
-   *
-   * <p>Each phone call line must contain exactly 4 comma-separated fields:
-   * caller number, callee number, begin time, and end time.
-   *
-   * <p>Blank lines in the file are ignored.
-   *
-   * @return a {@link PhoneBill} object containing the customer name and all parsed phone calls
-   * @throws ParserException if the file is empty, missing the customer name, contains
-   *                         malformatted lines, has invalid phone call data, or an I/O
-   *                         error occurs while reading the file
-   */
   @Override
   public PhoneBill parse() throws ParserException {
-    try (BufferedReader br = new BufferedReader(this.reader)) {
-      String customer = br.readLine();
-      if (customer == null || customer.isBlank()) {
-        throw new ParserException("The text file is empty or missing the customer name.");
+    try (BufferedReader br = new BufferedReader(reader)) {
+      String firstLine = br.readLine();
+      if (firstLine == null || firstLine.trim().isEmpty()) {
+        throw new ParserException("File is empty or missing the customer name");
       }
 
+      String customer = firstLine.trim();
       PhoneBill bill = new PhoneBill(customer);
+
       String line;
       while ((line = br.readLine()) != null) {
-        if (line.isBlank()) continue;
-
-        String[] parts = line.split(",");
-        if (parts.length != 4) {
-          throw new ParserException("Malformatted line in text file (expected 4 fields): " + line);
+        if (line.trim().isEmpty()) {
+          continue;
         }
-
-        try {
-          // Extract fields from the CSV line
-          String caller = parts[0];
-          String callee = parts[1];
-
-          // Parse strings into LocalDateTime objects
-          LocalDateTime begin = LocalDateTime.parse(parts[2], Project2.DATE_TIME_FORMATTER);
-          LocalDateTime end = LocalDateTime.parse(parts[3], Project2.DATE_TIME_FORMATTER);
-
-          // Pass the customer name and the parsed dates to the constructor
-          PhoneCall call = new PhoneCall(customer, caller, callee, begin, end);
-          bill.addPhoneCall(call);
-
-        } catch (java.time.format.DateTimeParseException e) {
-          throw new ParserException("Invalid date/time format in file. Expected MM/dd/yyyy HH:mm: " + e.getParsedString());
-        } catch (IllegalArgumentException e) {
-          throw new ParserException("Invalid call data in file: " + e.getMessage());
-        }
+        PhoneCall call = parseCall(line, customer);
+        bill.addPhoneCall(call);
       }
-      return bill;
 
+      return bill;
     } catch (IOException e) {
-      throw new ParserException("While parsing phone bill text", e);
+      throw new ParserException("Error reading file: " + e.getMessage(), e);
+    }
+  }
+
+  private PhoneCall parseCall(String line, String customer) throws ParserException {
+    String[] parts = line.split(DELIMITER);
+    if (parts.length != 5) {
+      throw new ParserException("Malformatted line in text file (expected 5 fields): " + line);
+    }
+
+    try {
+      // parts[0] is customer name (redundant, already have it from first line)
+      String caller = parts[1].trim();
+      String callee = parts[2].trim();
+      String beginTime = parts[3].trim();
+      String endTime = parts[4].trim();
+
+      LocalDateTime begin = LocalDateTime.parse(beginTime, DATE_TIME_FORMATTER);
+      LocalDateTime end = LocalDateTime.parse(endTime, DATE_TIME_FORMATTER);
+
+      return new PhoneCall(customer, caller, callee, begin, end);
+    } catch (java.time.format.DateTimeParseException e) {
+      throw new ParserException("Invalid date/time format in line: " + line, e);
+    } catch (Exception e) {
+      throw new ParserException("Error parsing call: " + line + " - " + e.getMessage(), e);
     }
   }
 }

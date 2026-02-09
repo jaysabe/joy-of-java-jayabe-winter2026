@@ -1,7 +1,5 @@
 package edu.pdx.cs.joy.jayabe;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +43,7 @@ class Project2Test {
     void testPrintOption() {
         String[] args = {
                 "-print", "Alice", "503-123-4567", "503-765-4321",
-                "01/27/2026 10:00", "01/27/2026 10:30"
+                "01/27/2026", "10:00", "01/27/2026", "10:30"
         };
         Project2.main(args);
 
@@ -77,7 +75,7 @@ class Project2Test {
         }
 
         String[] args = {"-textFile", textFile.getAbsolutePath(), cmdLineCustomer, 
-                         "503-123-4567", "503-765-4321", "01/27/2026 10:00", "01/27/2026 10:30"};
+                         "503-123-4567", "503-765-4321", "01/27/2026", "10:00", "01/27/2026", "10:30"};
         Project2.main(args);
 
         String errOutput = errContent.toString();
@@ -95,7 +93,7 @@ class Project2Test {
         }
 
         String[] args = {"-textFile", textFile.getAbsolutePath(), "CustomerName",
-                         "503-123-4567", "503-765-4321", "01/27/2026 10:00", "01/27/2026 10:30"};
+                         "503-123-4567", "503-765-4321", "01/27/2026", "10:00", "01/27/2026", "10:30"};
         Project2.main(args);
 
         String errOutput = errContent.toString();
@@ -107,7 +105,7 @@ class Project2Test {
     void testValidPhoneCallAddition() {
         String[] args = {
                 "Alice", "503-123-4567", "503-765-4321",
-                "01/27/2026 10:00", "01/27/2026 10:30"
+                "01/27/2026", "10:00", "01/27/2026", "10:30"
         };
         Project2.main(args);
 
@@ -123,7 +121,7 @@ class Project2Test {
         String[] args = {
                 "-textFile", textFile.getAbsolutePath(),
                 "Alice", "503-123-4567", "503-765-4321",
-                "01/27/2026 10:00", "01/27/2026 10:30"
+                "01/27/2026", "10:00", "01/27/2026", "10:30"
         };
         Project2.main(args);
 

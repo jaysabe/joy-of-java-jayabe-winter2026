@@ -36,8 +36,6 @@ import java.util.regex.Pattern;
  */
 public class Project2 {
   private static final Pattern PHONE_PATTERN = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
-  private static final Pattern TIME_PATTERN = Pattern.compile("\\d{1,2}:\\d{2}");
-  private static final Pattern DATE_PATTERN = Pattern.compile("\\d{1,2}/\\d{1,2}/\\d{4}");
   private static final String[] errors = {
           "Missing customer information",
           "Missing caller phone number",
@@ -49,7 +47,7 @@ public class Project2 {
   };
 
   /**
-   * Creates a new instance of the {@code Project3} class.
+   * Creates a new instance of the {@code Project2} class.
    * This constructor is used to initialize the application logic
    * for parsing and running the phone bill program.
    */
@@ -100,7 +98,6 @@ public class Project2 {
    * @throws IllegalArgumentException if an unknown option is provided or validation fails
    */
   void parseAndRun(String... args) {
-    boolean customerArg = false;
     boolean print = false;
     boolean readme = false;
     boolean textFileFlag = false;
@@ -113,42 +110,25 @@ public class Project2 {
       return;
     }
 
-    for (int i = 0; i < args.length; i++) {
+    // First pass: process all options
+    int i = 0;
+    while (i < args.length && args[i].startsWith("-")) {
       String arg = args[i];
-
-      if (!customerArg && arg.startsWith("-")) {
-          switch (arg) {
-              case "-print" -> print = true;
-              case "-README" -> readme = true;
-              case "-textFile" -> {
-                textFileFlag = true;
-                if(++i < args.length) {
-                  textFileName = args[i];
-                }
-              }
-              default -> throw new IllegalArgumentException("Unknown option: " + arg);
+      
+      switch (arg) {
+          case "-print" -> print = true;
+          case "-README" -> readme = true;
+          case "-textFile" -> {
+            if (++i < args.length) {
+              textFileName = args[i];
+              textFileFlag = true;
+            } else {
+              throw new IllegalArgumentException("-textFile requires a file path argument");
+            }
           }
-      } else {
-        customerArg = true;
-        // Handle quoted customer
-        if (arg.startsWith("\"")) {
-          StringBuilder sb = new StringBuilder();
-          sb.append(arg.substring(1)); // remove starting quote
-          while (!arg.endsWith("\"") && i + 1 < args.length) {
-            i++;
-            arg = args[i];
-            sb.append(" ").append(arg);
-          }
-          // remove trailing quote
-          String customer = sb.toString();
-          if (customer.endsWith("\"")) {
-            customer = customer.substring(0, customer.length() - 1);
-          }
-          arguments.add(customer);
-        } else {
-          arguments.add(arg);
-        }
+          default -> throw new IllegalArgumentException("Unknown option: " + arg);
       }
+      i++;
     }
 
     if (readme) {
@@ -156,12 +136,36 @@ public class Project2 {
       return;
     }
 
+    // Second pass: collect remaining arguments as customer data
+    while (i < args.length) {
+      String arg = args[i];
+      
+      // Handle quoted customer name
+      if (arg.startsWith("\"")) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(arg.substring(1));
+        while (!arg.endsWith("\"") && i + 1 < args.length) {
+          i++;
+          arg = args[i];
+          sb.append(" ").append(arg);
+        }
+        String customer = sb.toString();
+        if (customer.endsWith("\"")) {
+          customer = customer.substring(0, customer.length() - 1);
+        }
+        arguments.add(customer);
+      } else {
+        arguments.add(arg);
+      }
+      i++;
+    }
+
     int argCount = arguments.size();
-    if (argCount < 5) {
+    if (argCount < 7) {
       System.err.println(errors[Math.min(argCount, errors.length - 1)]);
       printUsage();
       return;
-    } else if (argCount > 5){
+    } else if (argCount > 7) {
       System.err.println("Too many command line arguments");
       printUsage();
       return;
@@ -170,8 +174,14 @@ public class Project2 {
     String customer = arguments.get(0);
     String callerNumber = arguments.get(1);
     String calleeNumber = arguments.get(2);
-    String beginDateTime = arguments.get(3);
-    String endDateTime = arguments.get(4);
+    String beginDate = arguments.get(3);
+    String beginTime = arguments.get(4);
+    String endDate = arguments.get(5);
+    String endTime = arguments.get(6);
+    
+    // Combine date and time
+    String beginDateTime = beginDate + " " + beginTime;
+    String endDateTime = endDate + " " + endTime;
 
     validatePhoneNumber(callerNumber, "caller number");
     validatePhoneNumber(calleeNumber, "callee number");
@@ -309,8 +319,10 @@ public class Project2 {
     System.out.println("  customer       Person whose phone bill we're modeling");
     System.out.println("  callerNumber   Phone number of caller");
     System.out.println("  calleeNumber   Phone number of person who was called");
-    System.out.println("  begin          Date and time call began (mm/dd/yyyy hh:mm)");
-    System.out.println("  end            Date and time call ended (mm/dd/yyyy hh:mm)");
+    System.out.println("  beginDate      Date call began (mm/dd/yyyy)");
+    System.out.println("  beginTime      Time call began (hh:mm)");
+    System.out.println("  endDate        Date call ended (mm/dd/yyyy)");
+    System.out.println("  endTime        Time call ended (hh:mm)");
     System.out.println();
     System.out.println("options are:");
     System.out.println("  -pretty file     Pretty print the phone bill to a text file\n");
