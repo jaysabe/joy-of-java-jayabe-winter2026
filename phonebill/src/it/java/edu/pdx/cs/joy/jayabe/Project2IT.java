@@ -110,7 +110,6 @@ class Project2IT extends InvokeMainTestCase {
     void testCustomerNameMismatchInFile(@org.junit.jupiter.api.io.TempDir java.io.File tempDir) throws java.io.IOException {
         java.io.File file = new java.io.File(tempDir, "mismatch.txt");
 
-        // Manually create a file for "Alice"
         try (java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.FileWriter(file))) {
             pw.println("Alice");
         }
