@@ -3,6 +3,7 @@ package edu.pdx.cs.joy.jayabe;
 import edu.pdx.cs.joy.AbstractPhoneBill;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * The <code>PhoneBill</code> class represents a phone bill for a specific customer.
@@ -61,12 +62,15 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
   }
 
   /**
-   * Returns all phone calls from one customer
-   * @return A collection of phone calls
+   * Returns all phone calls from one customer, sorted chronologically by begin time.
+   * If two phone calls begin at the same time, they are sorted by caller phone number.
+   * @return A collection of phone calls in sorted order
    * */
   @Override
   public Collection<PhoneCall> getPhoneCalls() {
-    return this.phoneCalls;
+    ArrayList<PhoneCall> sortedCalls = new ArrayList<>(this.phoneCalls);
+    Collections.sort(sortedCalls);
+    return sortedCalls;
   }
 
 

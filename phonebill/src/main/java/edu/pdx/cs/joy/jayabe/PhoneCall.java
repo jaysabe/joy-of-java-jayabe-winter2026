@@ -4,6 +4,7 @@ import edu.pdx.cs.joy.AbstractPhoneCall;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 /**
  * The <code>PhoneCall</code> class represents a single phone call between two parties.
@@ -26,7 +27,7 @@ import java.time.format.DateTimeFormatter;
  * @author Jay Abegglen
  * @version 1.0
  */
-public class PhoneCall extends AbstractPhoneCall {
+public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall> {
   /**
    * The name of the customer involved in this phone call.
    */
@@ -48,6 +49,7 @@ public class PhoneCall extends AbstractPhoneCall {
    */
   private final LocalDateTime end;
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
+  private static final DateTimeFormatter SHORT_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
 
   /**
    * Creates a new phone call
@@ -102,7 +104,7 @@ public class PhoneCall extends AbstractPhoneCall {
    */
   @Override
   public String getBeginTimeString() {
-    return this.begin.format(FORMATTER);
+    return this.begin.format(SHORT_FORMATTER);
   }
 
   @Override
@@ -115,6 +117,27 @@ public class PhoneCall extends AbstractPhoneCall {
    */
   @Override
   public String getEndTimeString() {
-    return this.end.format(FORMATTER);
+    return this.end.format(SHORT_FORMATTER);
+  }
+
+  /**
+   * Compares this phone call to another phone call for ordering.
+   * Phone calls are ordered first by begin time (chronologically), then by caller's phone number.
+   * Phone calls that begin at the same time by the same caller are considered equal.
+   *
+   * @param other the phone call to compare to
+   * @return a negative integer, zero, or a positive integer as this phone call
+   *         is less than, equal to, or greater than the specified phone call
+   */
+  @Override
+  public int compareTo(PhoneCall other) {
+    // First compare by begin time
+    int beginComparison = this.begin.compareTo(other.begin);
+    if (beginComparison != 0) {
+      return beginComparison;
+    }
+    
+    // If begin times are equal, compare by caller phone number
+    return this.callerNumber.compareTo(other.callerNumber);
   }
 }
