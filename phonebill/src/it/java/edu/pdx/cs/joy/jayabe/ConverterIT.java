@@ -24,6 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ConverterIT extends InvokeMainTestCase {
 
+  /**
+   * Invokes the Converter main method with the provided arguments.
+   *
+   * @param args command-line arguments for the Converter
+   * @return the result of invoking the main method
+   */
   private MainMethodResult invokeConverter(String... args) {
     return invokeMain(Converter.class, args);
   }

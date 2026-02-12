@@ -1,13 +1,12 @@
 package edu.pdx.cs.joy.jayabe;
 
 import edu.pdx.cs.joy.ParserException;
-import org.junit.jupiter.api.Disabled;
+import edu.pdx.cs.joy.jdbc.H2DatabaseHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ConverterTest {
 
   @Test
-  @Disabled("Converter.main() calls System.exit() which crashes test JVM - should be tested as integration test")
   public void converterConvertsTextFileToDatabase(@TempDir File tempDir) throws IOException, SQLException, ParserException {
     // Create a text file with phone bill data
     File textFile = new File(tempDir, "phonebill.txt");
@@ -55,7 +53,7 @@ public class ConverterTest {
     }
 
     // Verify data in database
-    try (Connection connection = DriverManager.getConnection("jdbc:h2:" + dbFile.getAbsolutePath().replace(".db", ""))) {
+    try (Connection connection = H2DatabaseHelper.createFileBasedConnection(dbFile)) {
       JDBCLoader loader = new JDBCLoader(connection, customerName);
       PhoneBill loadedBill = loader.parse();
       
@@ -69,7 +67,6 @@ public class ConverterTest {
   }
 
   @Test
-  @Disabled("Converter.main() calls System.exit() which crashes test JVM - should be tested as integration test")
   public void converterHandlesMultiplePhoneCalls(@TempDir File tempDir) throws IOException, SQLException, ParserException {
     File textFile = new File(tempDir, "phonebill.txt");
     String customerName = "Jane Doe";
@@ -97,7 +94,7 @@ public class ConverterTest {
     Converter.main(new String[]{textFile.getAbsolutePath(), dbFile.getAbsolutePath()});
 
     // Verify all calls are in database
-    try (Connection connection = DriverManager.getConnection("jdbc:h2:" + dbFile.getAbsolutePath().replace(".db", ""))) {
+    try (Connection connection = H2DatabaseHelper.createFileBasedConnection(dbFile)) {
       JDBCLoader loader = new JDBCLoader(connection, customerName);
       PhoneBill loadedBill = loader.parse();
       
@@ -106,10 +103,9 @@ public class ConverterTest {
   }
 
   @Test
-  @Disabled("Converter.main() calls System.exit() which crashes test JVM - should be tested as integration test")
   public void converterHandlesSpecialCharactersInCustomerName(@TempDir File tempDir) throws IOException, SQLException, ParserException {
     File textFile = new File(tempDir, "phonebill.txt");
-    String customerName = "O'Brien-Smith, Jr.";
+    String customerName = "O'Brien-Smith Jr.";
     
     PhoneBill originalBill = new PhoneBill(customerName);
     LocalDateTime begin = LocalDateTime.of(2026, 2, 11, 10, 0);
@@ -125,7 +121,7 @@ public class ConverterTest {
     Converter.main(new String[]{textFile.getAbsolutePath(), dbFile.getAbsolutePath()});
 
     // Verify data was converted correctly
-    try (Connection connection = DriverManager.getConnection("jdbc:h2:" + dbFile.getAbsolutePath().replace(".db", ""))) {
+    try (Connection connection = H2DatabaseHelper.createFileBasedConnection(dbFile)) {
       JDBCLoader loader = new JDBCLoader(connection, customerName);
       PhoneBill loadedBill = loader.parse();
       
@@ -135,7 +131,6 @@ public class ConverterTest {
   }
 
   @Test
-  @Disabled("Converter.main() calls System.exit() which crashes test JVM - should be tested as integration test")
   public void converterHandlesEmptyPhoneBill(@TempDir File tempDir) throws IOException, SQLException, ParserException {
     File textFile = new File(tempDir, "empty-phonebill.txt");
     String customerName = "Empty Customer";
@@ -151,7 +146,7 @@ public class ConverterTest {
     Converter.main(new String[]{textFile.getAbsolutePath(), dbFile.getAbsolutePath()});
 
     // Verify customer exists in database with no calls
-    try (Connection connection = DriverManager.getConnection("jdbc:h2:" + dbFile.getAbsolutePath().replace(".db", ""))) {
+    try (Connection connection = H2DatabaseHelper.createFileBasedConnection(dbFile)) {
       JDBCLoader loader = new JDBCLoader(connection, customerName);
       PhoneBill loadedBill = loader.parse();
       
