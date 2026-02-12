@@ -26,19 +26,32 @@ public class PhoneBillDAO {
   }
 
   /**
-   * Creates the customers table in the database.
+   * Creates the customers and phone_calls tables in the database.
    *
    * @param connection the database connection to use
    * @throws SQLException if a database error occurs
    */
   public static void createTable(Connection connection) throws SQLException {
-    String createTableSQL =
-      "CREATE TABLE customers (" +
-      "  name VARCHAR(255) PRIMARY KEY" +
+    String createCustomersTableSQL =
+      "CREATE TABLE IF NOT EXISTS customers (" +
+      "  id IDENTITY PRIMARY KEY," +
+      "  name VARCHAR(255)" +
+      ")";
+
+    String createPhoneCallsTableSQL =
+      "CREATE TABLE IF NOT EXISTS phone_calls (" +
+      "  id IDENTITY PRIMARY KEY," +
+      "  customer_id INTEGER," +
+      "  caller CHAR(12)," +
+      "  callee CHAR(12)," +
+      "  begin TIMESTAMP," +
+      "  \"end\" TIMESTAMP," +
+      "  FOREIGN KEY (customer_id) REFERENCES customers(id)" +
       ")";
 
     try (Statement statement = connection.createStatement()) {
-      statement.execute(createTableSQL);
+      statement.execute(createCustomersTableSQL);
+      statement.execute(createPhoneCallsTableSQL);
     }
   }
 

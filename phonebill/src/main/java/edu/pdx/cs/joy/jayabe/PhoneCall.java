@@ -48,7 +48,7 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
    * The date and time when the phone call ended.
    */
   private final LocalDateTime end;
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
+  // private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
   private static final DateTimeFormatter SHORT_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
 
   /**

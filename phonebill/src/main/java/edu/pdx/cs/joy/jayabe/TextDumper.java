@@ -7,13 +7,21 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 
+/**
+ * Dumps a phone bill to a text file in CSV format.
+ * Each line contains a phone call with customer name, caller, callee, begin time, and end time.
+ */
 public class TextDumper implements PhoneBillDumper<AbstractPhoneBill<PhoneCall>> {
-
   private final Writer writer;
   private static final String DELIMITER = ",";
   private static final DateTimeFormatter DATE_TIME_FORMATTER = 
           DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
+  /**
+   * Constructs a TextDumper with the specified writer.
+   *
+   * @param writer the {@link Writer} to write the phone bill data to
+   */
   public TextDumper(Writer writer) {
     this.writer = writer;
   }

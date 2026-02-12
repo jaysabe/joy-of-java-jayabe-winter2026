@@ -6,6 +6,10 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Parses a phone bill from a text file in CSV format.
+ * The first line contains the customer name, followed by lines with phone call details.
+ */
 public class TextParser implements edu.pdx.cs.joy.PhoneBillParser<PhoneBill> {
 
   private final Reader reader;
@@ -13,6 +17,11 @@ public class TextParser implements edu.pdx.cs.joy.PhoneBillParser<PhoneBill> {
   private static final DateTimeFormatter DATE_TIME_FORMATTER = 
           DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
 
+  /**
+   * Constructs a TextParser with the specified reader.
+   *
+   * @param reader the {@link Reader} to read the phone bill data from
+   */
   public TextParser(Reader reader) {
     this.reader = reader;
   }
@@ -49,8 +58,8 @@ public class TextParser implements edu.pdx.cs.joy.PhoneBillParser<PhoneBill> {
       throw new ParserException("Malformatted line in text file (expected 5 fields): " + line);
     }
 
+    // skip parts[0] since it should match the customer name and is redundant with the bill's customer
     try {
-      // parts[0] is customer name (redundant, already have it from first line)
       String caller = parts[1].trim();
       String callee = parts[2].trim();
       String beginTime = parts[3].trim();

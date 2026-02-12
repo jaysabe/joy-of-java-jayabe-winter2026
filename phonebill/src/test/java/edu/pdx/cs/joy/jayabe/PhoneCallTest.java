@@ -89,7 +89,6 @@ public class PhoneCallTest {
         LocalDateTime end = LocalDateTime.of(2025, 1, 15, 10, 45);
         PhoneCall phoneCall = new PhoneCall("John", "503-123-4567", "971-987-6543", begin, end);
 
-        // Fields are final, cannot be modified
         assertEquals("503-123-4567", phoneCall.getCaller());
         assertEquals("971-987-6543", phoneCall.getCallee());
         assertEquals("John", phoneCall.getCustomer());

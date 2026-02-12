@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -60,6 +61,17 @@ public class PhoneBillDAOTest {
   public void returnsNullWhenPhoneBillNotFound() throws SQLException {
     PhoneBill fetchedBill = dao.findByCustomer("Non-existent Customer");
     assertThat(fetchedBill, is(nullValue()));
+  }
+
+  @Test
+  public void canPersistAndFetchPhoneCallsByCustomerName() throws SQLException {
+    String customerName = "Jane Doe";
+    PhoneBill bill = new PhoneBill(customerName);
+    dao.save(bill);
+    PhoneBill fetchedBill = dao.findByCustomer(customerName);
+    assertThat(fetchedBill, is(notNullValue()));
+    Collection<PhoneCall> fetchedCalls = fetchedBill.getPhoneCalls();
+    assertThat(fetchedCalls, is(notNullValue()));
   }
 }
 
