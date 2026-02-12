@@ -38,7 +38,7 @@ public class Converter {
     if (args.length != 2) {
       System.err.println("Error: Missing command line arguments");
       printUsage();
-      System.exit(1);
+      return;
     }
 
     String textFile = args[0];
@@ -49,13 +49,10 @@ public class Converter {
       System.out.println("Successfully converted " + textFile + " to " + dbFile);
     } catch (IOException e) {
       System.err.println("Error reading text file: " + e.getMessage());
-      System.exit(1);
     } catch (ParserException e) {
       System.err.println("Error parsing text file: " + e.getMessage());
-      System.exit(1);
     } catch (SQLException e) {
       System.err.println("Error accessing database: " + e.getMessage());
-      System.exit(1);
     }
   }
 

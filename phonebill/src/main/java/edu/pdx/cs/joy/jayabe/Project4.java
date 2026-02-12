@@ -92,7 +92,6 @@ public class Project4 {
       System.err.println("Error: " + ex.getMessage());
       System.err.println();
       printUsage();
-      System.exit(1);
     }
   }
 

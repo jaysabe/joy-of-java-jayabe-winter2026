@@ -44,6 +44,10 @@ public class JDBCDumper implements PhoneBillDumper<AbstractPhoneBill<PhoneCall>>
    */
   @Override
   public void dump(AbstractPhoneBill<PhoneCall> bill) throws IOException {
+    if (bill == null) {
+      return;
+    }
+    
     try {
       // Get or create customer ID
       int customerId = getOrCreateCustomer(bill.getCustomer());
@@ -101,6 +105,24 @@ public class JDBCDumper implements PhoneBillDumper<AbstractPhoneBill<PhoneCall>>
    * @throws SQLException if a database error occurs
    */
   private void savePhoneCall(int customerId, PhoneCall call) throws SQLException {
+    // Check if this exact call already exists to avoid duplicates
+    String checkSQL = "SELECT COUNT(*) FROM phone_calls WHERE customer_id = ? AND caller = ? AND callee = ? AND begin = ? AND \"end\" = ?";
+    try (PreparedStatement checkStmt = connection.prepareStatement(checkSQL)) {
+      checkStmt.setInt(1, customerId);
+      checkStmt.setString(2, call.getCaller());
+      checkStmt.setString(3, call.getCallee());
+      checkStmt.setTimestamp(4, Timestamp.valueOf(call.getBeginTime()));
+      checkStmt.setTimestamp(5, Timestamp.valueOf(call.getEndTime()));
+      
+      try (ResultSet rs = checkStmt.executeQuery()) {
+        if (rs.next() && rs.getInt(1) > 0) {
+          // Call already exists, skip insertion
+          return;
+        }
+      }
+    }
+    
+    // Insert the new call
     String insertSQL = "INSERT INTO phone_calls (customer_id, caller, callee, begin, \"end\") VALUES (?, ?, ?, ?, ?)";
     
     try (PreparedStatement stmt = connection.prepareStatement(insertSQL)) {
