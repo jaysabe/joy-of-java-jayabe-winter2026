@@ -22,11 +22,14 @@ import java.sql.SQLException;
  *   <li><code>textFile</code> - The name of the text file to convert</li>
  *   <li><code>dbFile</code> - The name of the file containing the database</li>
  * </ul>
- *
- * @author Jay Abegglen
- * @version 1.0
  */
 public class Converter {
+
+  /**
+   * Creates a new Converter. Empty constructor since all functionality is in the static main method.
+   */
+  public Converter() {
+  }
 
   /**
    * Main entry point for the Converter application.
