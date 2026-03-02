@@ -4,6 +4,7 @@
     <artifactId>joy</artifactId>
     <groupId>io.github.davidwhitlock.joy</groupId>
     <version>1.2.4</version>
+    <relativePath/>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.pdx.cs.joy.jayabe</groupId>
@@ -109,7 +110,7 @@
               <addClasspath>true</addClasspath>
               <classpathLayoutType>repository</classpathLayoutType>
               <classpathPrefix>file:///${localRepositoryWithEscapedSpaces}</classpathPrefix>
-              <mainClass>edu.pdx.cs.joy.jayabe.Project4</mainClass>
+              <mainClass>edu.pdx.cs.joy.jayabe.Project5</mainClass>
             </manifest>
           </archive>
         </configuration>

@@ -23,28 +23,33 @@
 </h1>
 
 <h2>
-    These forms let you interact with the simple dictionary REST API that
-    is created by the project archetype.
+    These forms let you interact with the phone bill REST API.
 </h2>
 
 
 <div>
     <form method="get" action="calls">
-        List all dictionary entries <input type="submit" definition="Submit"/>
+        List all calls for customer <input name="customer" type="text" size="20" title="customer"/>
+        <input type="submit" definition="Submit"/>
     </form>
 </div>
 
 <div>
     <form method="get" action="calls">
-        List definition for word <input name="word" type="text" size="10" title="word"/>
+        Search calls for customer <input name="customer" type="text" size="20" title="customer"/>
+        begin <input name="begin" type="text" size="20" title="begin" placeholder="MM/dd/yyyy h:mm AM"/>
+        end <input name="end" type="text" size="20" title="end" placeholder="MM/dd/yyyy h:mm PM"/>
         <input type="submit" definition="Submit"/>
     </form>
 </div>
 
 <div>
     <form method="post" action="calls">
-        Create a dictionary entry <input name="word" type="text" size="10" title="word"/> :
-        <input name="definition" type="text" size="100" title="definition"/>
+        Add call customer <input name="customer" type="text" size="20" title="customer"/>
+        caller <input name="callerNumber" type="text" size="15" title="callerNumber"/>
+        callee <input name="calleeNumber" type="text" size="15" title="calleeNumber"/>
+        begin <input name="begin" type="text" size="20" title="begin" placeholder="MM/dd/yyyy h:mm AM"/>
+        end <input name="end" type="text" size="20" title="end" placeholder="MM/dd/yyyy h:mm PM"/>
         <input type="submit" definition="Submit"/>
     </form>
 </div>

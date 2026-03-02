@@ -1,18 +1,14 @@
 package edu.pdx.cs.joy.jayabe;
 
 import edu.pdx.cs.joy.InvokeMainTestCase;
-import edu.pdx.cs.joy.UncaughtExceptionInMain;
-import edu.pdx.cs.joy.web.HttpRequestHelper.RestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.MethodOrderer.MethodName;
 
 /**
@@ -24,64 +20,53 @@ class Project4IT extends InvokeMainTestCase {
     private static final String PORT = System.getProperty("http.port", "8080");
 
     @Test
-    void test0RemoveAllMappings() throws IOException {
+        void test0RemoveAllMappings() throws IOException {
       PhoneBillRestClient client = new PhoneBillRestClient(HOSTNAME, Integer.parseInt(PORT));
-      client.removeAllDictionaryEntries();
+            client.removeAllPhoneBills();
     }
 
     @Test
     void test1NoCommandLineArguments() {
         MainMethodResult result = invokeMain( Project4.class );
-        assertThat(result.getTextWrittenToStandardError(), containsString(Project4.MISSING_ARGS));
+        assertThat(result.getTextWrittenToStandardError(), containsString(Project5.MISSING_ARGS));
     }
 
     @Test
-    void test2EmptyServer() {
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT );
+    void test2SearchEmptyCustomerBill() {
+        MainMethodResult result = invokeMain(Project4.class,
+          "-host", HOSTNAME,
+          "-port", PORT,
+          "-search",
+          "Dave");
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
         String out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(PrettyPrinter.formatWordCount(0)));
+        assertThat(out, out, containsString("Customer: Dave"));
     }
 
     @Test
-    void test3NoDefinitionsThrowsAppointmentBookRestException() {
-        String word = "WORD";
-        try {
-            invokeMain(Project4.class, HOSTNAME, PORT, word);
-            fail("Expected a RestException to be thrown");
+    void test3AddCallAndSearch() {
+        MainMethodResult result = invokeMain(Project4.class,
+          "-host", HOSTNAME,
+          "-port", PORT,
+          "Dave",
+          "503-245-2345",
+          "765-389-1273",
+          "02/27/2026", "8:56", "AM",
+          "02/27/2026", "10:27", "AM");
 
-        } catch (UncaughtExceptionInMain ex) {
-            RestException cause = (RestException) ex.getCause();
-            assertThat(cause.getHttpStatusCode(), equalTo(HttpURLConnection.HTTP_NOT_FOUND));
-        }
-    }
+        assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
-    @Test
-    void test4AddDefinition() {
-        String word = "WORD";
-        String definition = "DEFINITION";
-
-        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, word, definition );
+        result = invokeMain(Project4.class,
+          "-host", HOSTNAME,
+          "-port", PORT,
+          "-search",
+          "Dave");
 
         assertThat(result.getTextWrittenToStandardError(), equalTo(""));
 
         String out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(Messages.definedWordAs(word, definition)));
-
-        result = invokeMain( Project4.class, HOSTNAME, PORT, word );
-
-        assertThat(result.getTextWrittenToStandardError(), equalTo(""));
-
-        out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(PrettyPrinter.formatDictionaryEntry(word, definition)));
-
-        result = invokeMain( Project4.class, HOSTNAME, PORT );
-
-        assertThat(result.getTextWrittenToStandardError(), equalTo(""));
-
-        out = result.getTextWrittenToStandardOut();
-        assertThat(out, out, containsString(PrettyPrinter.formatDictionaryEntry(word, definition)));
+        assertThat(out, out, containsString("503-245-2345"));
     }
 }

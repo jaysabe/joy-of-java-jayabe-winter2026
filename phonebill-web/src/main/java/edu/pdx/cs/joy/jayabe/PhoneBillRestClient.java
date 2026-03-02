@@ -8,14 +8,13 @@ import edu.pdx.cs.joy.web.HttpRequestHelper.RestException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
- * A helper class for accessing the rest client.  Note that this class provides
- * an example of how to make gets and posts to a URL.  You'll need to change it
- * to do something other than just send dictionary entries.
+ * A helper class for accessing the phone bill REST service.
  */
 public class PhoneBillRestClient {
 
@@ -40,35 +39,40 @@ public class PhoneBillRestClient {
     this.http = http;
   }
 
-  /**
-   * Returns all dictionary entries from the server
-   */
-  public Map<String, String> getAllDictionaryEntries() throws IOException, ParserException {
-    Response response = http.get(Map.of());
+  public List<PhoneCallRecord> getPhoneBill(String customer) throws IOException, ParserException {
+    Response response = http.get(Map.of(PhoneBillServlet.CUSTOMER_PARAMETER, customer));
     throwExceptionIfNotOkayHttpStatus(response);
 
     TextParser parser = new TextParser(new StringReader(response.getContent()));
-    return parser.parse();
+    return parser.parsePhoneCalls();
   }
 
-  /**
-   * Returns the definition for the given word
-   */
-  public String getDefinition(String word) throws IOException, ParserException {
-    Response response = http.get(Map.of(PhoneBillServlet.WORD_PARAMETER, word));
+  public List<PhoneCallRecord> searchPhoneCalls(String customer, String begin, String end) throws IOException, ParserException {
+    if (begin == null && end == null) {
+      return getPhoneBill(customer);
+    }
+
+    Response response = http.get(Map.of(
+      PhoneBillServlet.CUSTOMER_PARAMETER, customer,
+      PhoneBillServlet.BEGIN_PARAMETER, begin,
+      PhoneBillServlet.END_PARAMETER, end));
     throwExceptionIfNotOkayHttpStatus(response);
-    String content = response.getContent();
 
-    TextParser parser = new TextParser(new StringReader(content));
-    return parser.parse().get(word);
+    TextParser parser = new TextParser(new StringReader(response.getContent()));
+    return parser.parsePhoneCalls();
   }
 
-    public void addDictionaryEntry(String word, String definition) throws IOException {
-      Response response = http.post(Map.of(PhoneBillServlet.WORD_PARAMETER, word, PhoneBillServlet.DEFINITION_PARAMETER, definition));
+    public void addPhoneCall(String customer, String callerNumber, String calleeNumber, String begin, String end) throws IOException {
+      Response response = http.post(Map.of(
+        PhoneBillServlet.CUSTOMER_PARAMETER, customer,
+        PhoneBillServlet.CALLER_NUMBER_PARAMETER, callerNumber,
+        PhoneBillServlet.CALLEE_NUMBER_PARAMETER, calleeNumber,
+        PhoneBillServlet.BEGIN_PARAMETER, begin,
+        PhoneBillServlet.END_PARAMETER, end));
       throwExceptionIfNotOkayHttpStatus(response);
     }
 
-  public void removeAllDictionaryEntries() throws IOException {
+  public void removeAllPhoneBills() throws IOException {
       Response response = http.delete(Map.of());
       throwExceptionIfNotOkayHttpStatus(response);
     }

@@ -2,6 +2,7 @@ package edu.pdx.cs.joy.jayabe;
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.List;
 import java.util.Map;
 
 public class TextDumper {
@@ -17,6 +18,22 @@ public class TextDumper {
     ){
       for (Map.Entry<String, String> entry : dictionary.entrySet()) {
         pw.println(entry.getKey() + " : " + entry.getValue());
+      }
+
+      pw.flush();
+    }
+  }
+
+  public void dump(List<PhoneCallRecord> calls) {
+    try (
+      PrintWriter pw = new PrintWriter(this.writer)
+    ){
+      for (PhoneCallRecord call : calls) {
+        pw.println(
+          call.getCallerNumber() + "|" +
+            call.getCalleeNumber() + "|" +
+            call.getBeginAsString() + "|" +
+            call.getEndAsString());
       }
 
       pw.flush();

@@ -7,8 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This servlet ultimately provides a REST API for working with an
@@ -18,10 +24,13 @@ import java.util.Map;
  */
 public class PhoneBillServlet extends HttpServlet
 {
-    static final String WORD_PARAMETER = "word";
-    static final String DEFINITION_PARAMETER = "definition";
+    static final String CUSTOMER_PARAMETER = "customer";
+    static final String CALLER_NUMBER_PARAMETER = "callerNumber";
+    static final String CALLEE_NUMBER_PARAMETER = "calleeNumber";
+    static final String BEGIN_PARAMETER = "begin";
+    static final String END_PARAMETER = "end";
 
-    private final Map<String, String> dictionary = new HashMap<>();
+    private final Map<String, List<PhoneCallRecord>> phoneBills = new HashMap<>();
 
     /**
      * Handles an HTTP GET request from a client by writing the definition of the
@@ -34,14 +43,38 @@ public class PhoneBillServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
-        String word = getParameter( WORD_PARAMETER, request );
-        if (word != null) {
-            log("GET " + word);
-            writeDefinition(word, response);
+        String customer = getParameter(CUSTOMER_PARAMETER, request);
+        if (customer == null) {
+            missingRequiredParameter(response, CUSTOMER_PARAMETER);
+            return;
+        }
 
-        } else {
-            log("GET all dictionary entries");
-            writeAllDictionaryEntries(response);
+        String begin = getParameter(BEGIN_PARAMETER, request);
+        String end = getParameter(END_PARAMETER, request);
+
+        if ((begin == null) != (end == null)) {
+            missingRequiredParameter(response, begin == null ? BEGIN_PARAMETER : END_PARAMETER);
+            return;
+        }
+
+        List<PhoneCallRecord> allCalls = this.phoneBills.getOrDefault(customer, List.of());
+        if (begin == null) {
+            writeCalls(response, new ArrayList<>(allCalls));
+            return;
+        }
+
+        try {
+            LocalDateTime beginTime = LocalDateTime.parse(begin, PhoneCallRecord.DATE_TIME_FORMAT);
+            LocalDateTime endTime = LocalDateTime.parse(end, PhoneCallRecord.DATE_TIME_FORMAT);
+
+            List<PhoneCallRecord> filtered = allCalls.stream()
+              .filter(call -> call.beginsBetween(beginTime, endTime))
+              .collect(Collectors.toList());
+
+            writeCalls(response, filtered);
+
+        } catch (DateTimeParseException ex) {
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Invalid date/time format");
         }
     }
 
@@ -55,24 +88,51 @@ public class PhoneBillServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
-        String word = getParameter(WORD_PARAMETER, request );
-        if (word == null) {
-            missingRequiredParameter(response, WORD_PARAMETER);
+                String customer = getParameter(CUSTOMER_PARAMETER, request);
+                if (customer == null) {
+                        missingRequiredParameter(response, CUSTOMER_PARAMETER);
             return;
         }
 
-        String definition = getParameter(DEFINITION_PARAMETER, request );
-        if ( definition == null) {
-            missingRequiredParameter( response, DEFINITION_PARAMETER );
-            return;
-        }
+                String callerNumber = getParameter(CALLER_NUMBER_PARAMETER, request);
+                if (callerNumber == null) {
+                    missingRequiredParameter(response, CALLER_NUMBER_PARAMETER);
+                    return;
+                }
 
-        log("POST " + word + " -> " + definition);
+                String calleeNumber = getParameter(CALLEE_NUMBER_PARAMETER, request);
+                if (calleeNumber == null) {
+                    missingRequiredParameter(response, CALLEE_NUMBER_PARAMETER);
+                    return;
+                }
 
-        this.dictionary.put(word, definition);
+                String begin = getParameter(BEGIN_PARAMETER, request);
+                if (begin == null) {
+                    missingRequiredParameter(response, BEGIN_PARAMETER);
+                    return;
+                }
+
+                String end = getParameter(END_PARAMETER, request);
+                if (end == null) {
+                    missingRequiredParameter(response, END_PARAMETER);
+                    return;
+                }
+
+                PhoneCallRecord call;
+                try {
+                    call = PhoneCallRecord.fromStrings(callerNumber, calleeNumber, begin, end);
+
+                } catch (DateTimeParseException ex) {
+                    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Invalid date/time format");
+                    return;
+                }
+
+                this.phoneBills.computeIfAbsent(customer, ignored -> new ArrayList<>()).add(call);
+
+                log("POST " + customer + " " + callerNumber + " -> " + calleeNumber);
 
         PrintWriter pw = response.getWriter();
-        pw.println(Messages.definedWordAs(word, definition));
+                pw.println(Messages.addedPhoneCallForCustomer(customer));
         pw.flush();
 
         response.setStatus( HttpServletResponse.SC_OK);
@@ -87,12 +147,12 @@ public class PhoneBillServlet extends HttpServlet
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
 
-        log("DELETE all dictionary entries");
+        log("DELETE all phone bills");
 
-        this.dictionary.clear();
+        this.phoneBills.clear();
 
         PrintWriter pw = response.getWriter();
-        pw.println(Messages.allDictionaryEntriesDeleted());
+        pw.println(Messages.allPhoneBillsDeleted());
         pw.flush();
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -116,33 +176,11 @@ public class PhoneBillServlet extends HttpServlet
      *
      * The text of the message is formatted with {@link TextDumper}
      */
-    private void writeDefinition(String word, HttpServletResponse response) throws IOException {
-        String definition = this.dictionary.get(word);
-
-        if (definition == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        } else {
-            PrintWriter pw = response.getWriter();
-
-            Map<String, String> wordDefinition = Map.of(word, definition);
-            TextDumper dumper = new TextDumper(pw);
-            dumper.dump(wordDefinition);
-
-            response.setStatus(HttpServletResponse.SC_OK);
-        }
-    }
-
-    /**
-     * Writes all of the dictionary entries to the HTTP response.
-     *
-     * The text of the message is formatted with {@link TextDumper}
-     */
-    private void writeAllDictionaryEntries(HttpServletResponse response ) throws IOException
-    {
+    private void writeCalls(HttpServletResponse response, List<PhoneCallRecord> calls) throws IOException {
+        calls.sort(Comparator.comparing(PhoneCallRecord::getBeginTime));
         PrintWriter pw = response.getWriter();
         TextDumper dumper = new TextDumper(pw);
-        dumper.dump(dictionary);
+        dumper.dump(calls);
 
         response.setStatus( HttpServletResponse.SC_OK );
     }
@@ -164,8 +202,8 @@ public class PhoneBillServlet extends HttpServlet
     }
 
     @VisibleForTesting
-    String getDefinition(String word) {
-        return this.dictionary.get(word);
+    List<PhoneCallRecord> getPhoneBill(String customer) {
+        return this.phoneBills.getOrDefault(customer, List.of());
     }
 
     @Override

@@ -6,7 +6,7 @@ import edu.pdx.cs.joy.web.HttpRequestHelper.Response;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,21 +18,34 @@ import static org.mockito.Mockito.when;
 public class PhoneBillRestClientTest {
 
   @Test
-  void getAllDictionaryEntriesPerformsHttpGetWithNoParameters() throws ParserException, IOException {
-    Map<String, String> dictionary = Map.of("One", "1", "Two", "2");
+  void getPhoneBillPerformsHttpGetWithCustomerParameter() throws ParserException, IOException {
+    String customer = "Dave";
+    String content = "503-245-2345|765-389-1273|02/27/2026 8:56 AM|02/27/2026 10:27 AM\n";
 
     HttpRequestHelper http = mock(HttpRequestHelper.class);
-    when(http.get(eq(Map.of()))).thenReturn(dictionaryAsText(dictionary));
+    when(http.get(eq(Map.of(PhoneBillServlet.CUSTOMER_PARAMETER, customer)))).thenReturn(new Response(content));
 
     PhoneBillRestClient client = new PhoneBillRestClient(http);
+    List<PhoneCallRecord> calls = client.getPhoneBill(customer);
 
-    assertThat(client.getAllDictionaryEntries(), equalTo(dictionary));
+    assertThat(calls.size(), equalTo(1));
+    assertThat(calls.get(0).getCallerNumber(), equalTo("503-245-2345"));
   }
 
-  private Response dictionaryAsText(Map<String, String> dictionary) {
-    StringWriter writer = new StringWriter();
-    new TextDumper(writer).dump(dictionary);
+  @Test
+  void searchCallsPerformsHttpGetWithCustomerAndDateRange() throws IOException, ParserException {
+    String customer = "Dave";
+    String begin = "03/01/2026 12:00 AM";
+    String end = "03/31/2026 11:59 PM";
 
-    return new Response(writer.toString());
+    HttpRequestHelper http = mock(HttpRequestHelper.class);
+    when(http.get(eq(Map.of(
+      PhoneBillServlet.CUSTOMER_PARAMETER, customer,
+      PhoneBillServlet.BEGIN_PARAMETER, begin,
+      PhoneBillServlet.END_PARAMETER, end
+    )))).thenReturn(new Response(""));
+
+    PhoneBillRestClient client = new PhoneBillRestClient(http);
+    client.searchPhoneCalls(customer, begin, end);
   }
 }

@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.List;
 import java.util.Map;
 
 public class PrettyPrinter {
@@ -42,5 +43,23 @@ public class PrettyPrinter {
       pw.flush();
     }
 
+  }
+
+  public void dump(String customer, List<PhoneCallRecord> calls) {
+    try (
+      PrintWriter pw = new PrintWriter(this.writer)
+    ) {
+      pw.println("Customer: " + customer);
+      if (calls.isEmpty()) {
+        pw.println("No phone calls found");
+      }
+
+      for (PhoneCallRecord call : calls) {
+        pw.println(call.getCallerNumber() + " -> " + call.getCalleeNumber() +
+          " from " + call.getBeginAsString() + " to " + call.getEndAsString());
+      }
+
+      pw.flush();
+    }
   }
 }

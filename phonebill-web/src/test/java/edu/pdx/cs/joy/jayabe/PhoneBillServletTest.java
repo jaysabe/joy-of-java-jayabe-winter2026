@@ -1,8 +1,6 @@
 package edu.pdx.cs.joy.jayabe;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +10,6 @@ import java.io.StringWriter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
 /**
@@ -21,33 +18,34 @@ import static org.mockito.Mockito.*;
  */
 class PhoneBillServletTest {
 
+  private static final String CUSTOMER = "Dave";
+  private static final String CALLER = "503-245-2345";
+  private static final String CALLEE = "765-389-1273";
+  private static final String BEGIN = "02/27/2026 8:56 AM";
+  private static final String END = "02/27/2026 10:27 AM";
+
   @Test
-  void initiallyServletContainsNoDictionaryEntries() throws ServletException, IOException {
+  void getWithoutCustomerReturnsPreconditionFailed() throws ServletException, IOException {
     PhoneBillServlet servlet = new PhoneBillServlet();
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpServletResponse response = mock(HttpServletResponse.class);
-    PrintWriter pw = mock(PrintWriter.class);
-
-    when(response.getWriter()).thenReturn(pw);
 
     servlet.doGet(request, response);
 
-    // Nothing is written to the response's PrintWriter
-    verify(pw, never()).println(anyString());
-    verify(response).setStatus(HttpServletResponse.SC_OK);
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains("customer"));
   }
 
   @Test
-  void addOneWordToDictionary() throws ServletException, IOException {
+  void addPhoneCallAndFetchCustomerBill() throws ServletException, IOException {
     PhoneBillServlet servlet = new PhoneBillServlet();
 
-    String word = "TEST WORD";
-    String definition = "TEST DEFINITION";
-
     HttpServletRequest request = mock(HttpServletRequest.class);
-    when(request.getParameter(PhoneBillServlet.WORD_PARAMETER)).thenReturn(word);
-    when(request.getParameter(PhoneBillServlet.DEFINITION_PARAMETER)).thenReturn(definition);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(CALLER);
+    when(request.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(CALLEE);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn(BEGIN);
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(END);
 
     HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -59,15 +57,58 @@ class PhoneBillServletTest {
 
     servlet.doPost(request, response);
 
-    assertThat(stringWriter.toString(), containsString(Messages.definedWordAs(word, definition)));
+    assertThat(stringWriter.toString(), containsString(Messages.addedPhoneCallForCustomer(CUSTOMER)));
+    verify(response).setStatus(HttpServletResponse.SC_OK);
 
-    // Use an ArgumentCaptor when you want to make multiple assertions against the value passed to the mock
-    ArgumentCaptor<Integer> statusCode = ArgumentCaptor.forClass(Integer.class);
-    verify(response).setStatus(statusCode.capture());
+    HttpServletRequest getRequest = mock(HttpServletRequest.class);
+    when(getRequest.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
 
-    assertThat(statusCode.getValue(), equalTo(HttpServletResponse.SC_OK));
+    HttpServletResponse getResponse = mock(HttpServletResponse.class);
+    StringWriter getBody = new StringWriter();
+    when(getResponse.getWriter()).thenReturn(new PrintWriter(getBody, true));
 
-    assertThat(servlet.getDefinition(word), equalTo(definition));
+    servlet.doGet(getRequest, getResponse);
+
+    assertThat(getBody.toString(), containsString(CALLER));
+    assertThat(getBody.toString(), containsString(CALLEE));
+    verify(getResponse).setStatus(HttpServletResponse.SC_OK);
+  }
+
+  @Test
+  void getWithBeginAndEndFiltersCallsByStartTime() throws ServletException, IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    addCall(servlet, CUSTOMER, CALLER, CALLEE, "03/01/2026 9:00 AM", "03/01/2026 9:30 AM");
+    addCall(servlet, CUSTOMER, "503-222-1000", "503-222-2000", "03/15/2026 1:00 PM", "03/15/2026 1:20 PM");
+
+    HttpServletRequest searchRequest = mock(HttpServletRequest.class);
+    when(searchRequest.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(searchRequest.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn("03/10/2026 12:00 AM");
+    when(searchRequest.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn("03/31/2026 11:59 PM");
+
+    HttpServletResponse searchResponse = mock(HttpServletResponse.class);
+    StringWriter body = new StringWriter();
+    when(searchResponse.getWriter()).thenReturn(new PrintWriter(body, true));
+
+    servlet.doGet(searchRequest, searchResponse);
+
+    assertThat(body.toString(), containsString("503-222-1000"));
+    assertThat(body.toString(), containsString("503-222-2000"));
+  }
+
+  private void addCall(PhoneBillServlet servlet, String customer, String caller, String callee, String begin, String end)
+    throws IOException {
+    HttpServletRequest postRequest = mock(HttpServletRequest.class);
+    when(postRequest.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(customer);
+    when(postRequest.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(caller);
+    when(postRequest.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(callee);
+    when(postRequest.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn(begin);
+    when(postRequest.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(end);
+
+    HttpServletResponse postResponse = mock(HttpServletResponse.class);
+    when(postResponse.getWriter()).thenReturn(new PrintWriter(new StringWriter(), true));
+
+    servlet.doPost(postRequest, postResponse);
   }
 
 }
