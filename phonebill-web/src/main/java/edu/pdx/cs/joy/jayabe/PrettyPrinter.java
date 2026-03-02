@@ -1,7 +1,5 @@
 package edu.pdx.cs.joy.jayabe;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
@@ -9,18 +7,6 @@ import java.util.Map;
 
 public class PrettyPrinter {
   private final Writer writer;
-
-  @VisibleForTesting
-  static String formatWordCount(int count )
-  {
-    return String.format( "Dictionary on server contains %d words", count );
-  }
-
-  @VisibleForTesting
-  static String formatDictionaryEntry(String word, String definition )
-  {
-    return String.format("  %s -> %s", word, definition);
-  }
 
 
   public PrettyPrinter(Writer writer) {
@@ -32,7 +18,7 @@ public class PrettyPrinter {
       PrintWriter pw = new PrintWriter(this.writer)
     ) {
 
-      pw.println(formatWordCount(dictionary.size()));
+      pw.println(String.format("Dictionary contains %d entries", dictionary.size()));
 
       for (Map.Entry<String, String> entry : dictionary.entrySet()) {
         String word = entry.getKey();
@@ -51,7 +37,7 @@ public class PrettyPrinter {
     ) {
       pw.println("Customer: " + customer);
       if (calls.isEmpty()) {
-        pw.println("No phone calls found");
+        pw.println("No phone calls found in the specified range");
       }
 
       for (PhoneCallRecord call : calls) {

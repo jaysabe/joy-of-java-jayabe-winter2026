@@ -32,6 +32,20 @@ class Project4IT extends InvokeMainTestCase {
     }
 
     @Test
+    void test1ReadmeOptionPrintsReadmeAndExits() {
+      MainMethodResult result = invokeMain(Project4.class, "-README");
+
+      assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+      assertThat(result.getTextWrittenToStandardOut(), containsString("Project 5"));
+    }
+
+    @Test
+    void test1HostWithoutPortIsAnError() {
+      MainMethodResult result = invokeMain(Project4.class, "-host", HOSTNAME, "Dave");
+      assertThat(result.getTextWrittenToStandardError(), containsString("Host and port must be specified together"));
+    }
+
+    @Test
     void test2SearchEmptyCustomerBill() {
         MainMethodResult result = invokeMain(Project4.class,
           "-host", HOSTNAME,
@@ -44,6 +58,46 @@ class Project4IT extends InvokeMainTestCase {
         String out = result.getTextWrittenToStandardOut();
         assertThat(out, out, containsString("Customer: Dave"));
     }
+
+      @Test
+      void test2SearchRangeWithNoMatchesPrintsMessage() {
+        MainMethodResult result = invokeMain(Project4.class,
+          "-host", HOSTNAME,
+          "-port", PORT,
+          "-search",
+          "Dave",
+          "03/01/2027", "12:00", "AM",
+          "03/31/2027", "11:59", "PM");
+
+        assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("No phone calls found in the specified range"));
+      }
+
+      @Test
+      void test2SearchDoesNotAllowPrintOption() {
+        MainMethodResult result = invokeMain(Project4.class,
+          "-host", HOSTNAME,
+          "-port", PORT,
+          "-search",
+          "-print",
+          "Dave");
+
+        assertThat(result.getTextWrittenToStandardError(), containsString("-print is not supported with -search"));
+      }
+
+  @Test
+  void test2InvalidDateFormatIsReported() {
+    MainMethodResult result = invokeMain(Project4.class,
+      "-host", HOSTNAME,
+      "-port", PORT,
+      "Dave",
+      "503-245-2345",
+      "765-389-1273",
+      "02/27/2026", "25:61", "AM",
+      "02/27/2026", "10:27", "AM");
+
+    assertThat(result.getTextWrittenToStandardError(), containsString("Invalid date/time format"));
+  }
 
     @Test
     void test3AddCallAndSearch() {

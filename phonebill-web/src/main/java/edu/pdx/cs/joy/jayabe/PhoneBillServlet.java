@@ -129,8 +129,6 @@ public class PhoneBillServlet extends HttpServlet
 
                 this.phoneBills.computeIfAbsent(customer, ignored -> new ArrayList<>()).add(call);
 
-                log("POST " + customer + " " + callerNumber + " -> " + calleeNumber);
-
         PrintWriter pw = response.getWriter();
                 pw.println(Messages.addedPhoneCallForCustomer(customer));
         pw.flush();
@@ -146,8 +144,6 @@ public class PhoneBillServlet extends HttpServlet
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
-
-        log("DELETE all phone bills");
 
         this.phoneBills.clear();
 
@@ -206,8 +202,4 @@ public class PhoneBillServlet extends HttpServlet
         return this.phoneBills.getOrDefault(customer, List.of());
     }
 
-    @Override
-    public void log(String msg) {
-      System.out.println(msg);
-    }
 }

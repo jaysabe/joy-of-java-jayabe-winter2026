@@ -96,6 +96,39 @@ class PhoneBillServletTest {
     assertThat(body.toString(), containsString("503-222-2000"));
   }
 
+  @Test
+  void getWithOnlyBeginReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn("03/01/2026 12:00 AM");
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doGet(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.END_PARAMETER));
+  }
+
+  @Test
+  void postWithInvalidDateReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest postRequest = mock(HttpServletRequest.class);
+    when(postRequest.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(postRequest.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(CALLER);
+    when(postRequest.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(CALLEE);
+    when(postRequest.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn("not-a-date");
+    when(postRequest.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(END);
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doPost(postRequest, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains("Invalid date/time format"));
+  }
+
   private void addCall(PhoneBillServlet servlet, String customer, String caller, String callee, String begin, String end)
     throws IOException {
     HttpServletRequest postRequest = mock(HttpServletRequest.class);
