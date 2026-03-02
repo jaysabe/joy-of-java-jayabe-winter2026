@@ -20,7 +20,6 @@ accordingly
   <url>http://YourGitHubUserInLowerCase.github.io/JoyOfCodingWinter2026</url>
   <modules>
     <module>koans</module>
-    <module>student</module>
     <module>phonebill</module>
   </modules>
   <inceptionYear>2026</inceptionYear>
@@ -99,5 +98,4 @@ accordingly
       <url>scm:git:git@github.com:YourGithubUser/JoyOfCodingWinter2026.git</url>
     </site>
   </distributionManagement>
-  <mainClass>edu.pdx.cs.joy.[your-login-id].Project2</mainClass>
 </project>
