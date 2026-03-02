@@ -21,6 +21,7 @@ accordingly
   <modules>
     <module>koans</module>
     <module>phonebill</module>
+    <module>phonebill-web</module>
   </modules>
   <inceptionYear>2026</inceptionYear>
   <organization>
