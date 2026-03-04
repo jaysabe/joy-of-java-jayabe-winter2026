@@ -18,9 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * This servlet ultimately provides a REST API for working with an
- * <code>PhoneBill</code>.  However, in its current state, it is an example
- * of how to use HTTP and Java servlets to store simple dictionary of words
- * and their definitions.
+ * <code>PhoneBill</code> by customer name.
  */
 public class PhoneBillServlet extends HttpServlet
 {
@@ -33,10 +31,9 @@ public class PhoneBillServlet extends HttpServlet
     private final Map<String, List<PhoneCallRecord>> phoneBills = new HashMap<>();
 
     /**
-     * Handles an HTTP GET request from a client by writing the definition of the
-     * word specified in the "word" HTTP parameter to the HTTP response.  If the
-     * "word" parameter is not specified, all of the entries in the dictionary
-     * are written to the HTTP response.
+     * Handles an HTTP GET request by returning calls for a customer.
+     * If {@code begin} and {@code end} are present, results are filtered by
+     * inclusive begin-time range.
      */
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws IOException
@@ -79,9 +76,7 @@ public class PhoneBillServlet extends HttpServlet
     }
 
     /**
-     * Handles an HTTP POST request by storing the dictionary entry for the
-     * "word" and "definition" request parameters.  It writes the dictionary
-     * entry to the HTTP response.
+     * Handles an HTTP POST request by adding one phone call to a customer's bill.
      */
     @Override
     protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws IOException
@@ -137,7 +132,7 @@ public class PhoneBillServlet extends HttpServlet
     }
 
     /**
-     * Handles an HTTP DELETE request by removing all dictionary entries.  This
+     * Handles an HTTP DELETE request by removing all phone bills. This
      * behavior is exposed for testing purposes only.  It's probably not
      * something that you'd want a real application to expose.
      */
@@ -158,7 +153,8 @@ public class PhoneBillServlet extends HttpServlet
     /**
      * Writes an error message about a missing parameter to the HTTP response.
      *
-     * The text of the error message is created by {@link Messages#missingRequiredParameter(String)}
+        * The text of the error message is created by
+        * {@link Messages#missingRequiredParameter(String)}.
      */
     private void missingRequiredParameter( HttpServletResponse response, String parameterName )
         throws IOException
@@ -168,9 +164,9 @@ public class PhoneBillServlet extends HttpServlet
     }
 
     /**
-     * Writes the definition of the given word to the HTTP response.
+      * Writes calls to the HTTP response in text format.
      *
-     * The text of the message is formatted with {@link TextDumper}
+      * The response text is formatted with {@link TextDumper}.
      */
     private void writeCalls(HttpServletResponse response, List<PhoneCallRecord> calls) throws IOException {
         calls.sort(Comparator.comparing(PhoneCallRecord::getBeginTime));
@@ -184,6 +180,8 @@ public class PhoneBillServlet extends HttpServlet
     /**
      * Returns the value of the HTTP request parameter with the given name.
      *
+      * @param name Parameter name
+      * @param request HTTP request
      * @return <code>null</code> if the value of the parameter is
      *         <code>null</code> or is the empty string
      */
@@ -197,6 +195,12 @@ public class PhoneBillServlet extends HttpServlet
       }
     }
 
+    /**
+     * Returns all calls for a customer, or an empty list if none exist.
+     *
+     * @param customer Customer name
+     * @return Existing phone call list for the customer
+     */
     @VisibleForTesting
     List<PhoneCallRecord> getPhoneBill(String customer) {
         return this.phoneBills.getOrDefault(customer, List.of());

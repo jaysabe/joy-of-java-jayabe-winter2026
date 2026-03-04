@@ -46,6 +46,30 @@ class Project4IT extends InvokeMainTestCase {
     }
 
     @Test
+    void test1MissingHostNameIsAnError() {
+      MainMethodResult result = invokeMain(Project4.class, "-host");
+      assertThat(result.getTextWrittenToStandardError(), containsString("Missing host name"));
+    }
+
+    @Test
+    void test1MissingPortValueIsAnError() {
+      MainMethodResult result = invokeMain(Project4.class, "-host", HOSTNAME, "-port");
+      assertThat(result.getTextWrittenToStandardError(), containsString("Missing port"));
+    }
+
+    @Test
+    void test1InvalidPortIsAnError() {
+      MainMethodResult result = invokeMain(Project4.class, "-host", HOSTNAME, "-port", "not-a-number", "Dave");
+      assertThat(result.getTextWrittenToStandardError(), containsString("must be an integer"));
+    }
+
+    @Test
+    void test1UnknownOptionIsAnError() {
+      MainMethodResult result = invokeMain(Project4.class, "-host", HOSTNAME, "-port", PORT, "-bogus");
+      assertThat(result.getTextWrittenToStandardError(), containsString("Unknown option: -bogus"));
+    }
+
+    @Test
     void test2SearchEmptyCustomerBill() {
         MainMethodResult result = invokeMain(Project4.class,
           "-host", HOSTNAME,
@@ -99,6 +123,39 @@ class Project4IT extends InvokeMainTestCase {
     assertThat(result.getTextWrittenToStandardError(), containsString("Invalid date/time format"));
   }
 
+  @Test
+  void test2SearchWithWrongArgumentCountIsAnError() {
+    MainMethodResult result = invokeMain(Project4.class,
+      "-host", HOSTNAME,
+      "-port", PORT,
+      "-search",
+      "Dave",
+      "03/01/2026", "12:00");
+
+    assertThat(result.getTextWrittenToStandardError(), containsString("Search requires customer or customer begin end"));
+  }
+
+  @Test
+  void test2AddWithMissingArgumentsIsAnError() {
+    MainMethodResult result = invokeMain(Project4.class,
+      "-host", HOSTNAME,
+      "-port", PORT,
+      "Dave");
+
+    assertThat(result.getTextWrittenToStandardError(), containsString(Project5.MISSING_ARGS));
+  }
+
+  @Test
+  void test2ConnectionFailureIsReported() {
+    MainMethodResult result = invokeMain(Project4.class,
+      "-host", HOSTNAME,
+      "-port", "1",
+      "-search",
+      "Dave");
+
+    assertThat(result.getTextWrittenToStandardError(), containsString("While contacting server:"));
+  }
+
     @Test
     void test3AddCallAndSearch() {
         MainMethodResult result = invokeMain(Project4.class,
@@ -123,4 +180,20 @@ class Project4IT extends InvokeMainTestCase {
         String out = result.getTextWrittenToStandardOut();
         assertThat(out, out, containsString("503-245-2345"));
     }
+
+      @Test
+      void test3PrintOptionPrintsNewCallDescription() {
+        MainMethodResult result = invokeMain(Project4.class,
+          "-host", HOSTNAME,
+          "-port", PORT,
+          "-print",
+          "Dave",
+          "503-999-9999",
+          "503-888-8888",
+          "03/03/2026", "9:01", "AM",
+          "03/03/2026", "9:41", "AM");
+
+        assertThat(result.getTextWrittenToStandardError(), equalTo(""));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("503-999-9999 -> 503-888-8888"));
+      }
 }

@@ -10,10 +10,19 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Command-line client for the Phone Bill REST service.
+ */
 public class Project5 {
 
+  /** Error text shown when required positional arguments are missing. */
   public static final String MISSING_ARGS = "Missing command line arguments";
 
+  /**
+   * Parses command-line options and delegates to add/search operations.
+   *
+   * @param args Command-line arguments
+   */
   public static void main(String... args) {
     String hostName = null;
     String portString = null;
@@ -96,6 +105,14 @@ public class Project5 {
     }
   }
 
+  /**
+   * Runs a search operation for a customer, optionally with a date/time range.
+   *
+   * @param client REST client
+   * @param positional Positional command-line arguments
+   * @throws IOException If HTTP communication fails
+   * @throws ParserException If server response cannot be parsed
+   */
   private static void runSearch(PhoneBillRestClient client, List<String> positional) throws IOException, ParserException {
     if (positional.size() != 1 && positional.size() != 7) {
       throw new IllegalArgumentException("Search requires customer or customer begin end");
@@ -118,6 +135,14 @@ public class Project5 {
     System.out.println(sw);
   }
 
+  /**
+   * Runs an add operation for one phone call.
+   *
+   * @param client REST client
+   * @param positional Positional command-line arguments
+   * @param print Whether to print the newly added call summary
+   * @throws IOException If HTTP communication fails
+   */
   private static void runAdd(PhoneBillRestClient client, List<String> positional, boolean print) throws IOException {
     if (positional.size() != 9) {
       throw new IllegalArgumentException("Missing command line arguments");
@@ -139,6 +164,12 @@ public class Project5 {
     }
   }
 
+  /**
+   * Validates one date/time string using {@link PhoneCallRecord#DATE_TIME_FORMAT}.
+   *
+   * @param text Date/time text to validate
+   * @throws IllegalArgumentException If the text is not in the expected format
+   */
   private static void validateDateTime(String text) {
     try {
       LocalDateTime.parse(text, PhoneCallRecord.DATE_TIME_FORMAT);
@@ -148,15 +179,26 @@ public class Project5 {
     }
   }
 
+  /** Prints the README text for this project. */
   private static void printReadme() {
     System.out.println("Project 5: REST-ful Phone Bill Web Service client");
   }
 
+  /**
+   * Writes one error line to standard error.
+   *
+   * @param message Error message text
+   */
   private static void error(String message) {
     PrintStream err = System.err;
     err.println("** " + message);
   }
 
+  /**
+   * Writes a usage message and command synopsis to standard error.
+   *
+   * @param message Reason the usage was shown
+   */
   private static void usage(String message) {
     PrintStream err = System.err;
     err.println("** " + message);

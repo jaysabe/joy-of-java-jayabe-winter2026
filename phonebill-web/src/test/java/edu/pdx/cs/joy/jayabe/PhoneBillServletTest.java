@@ -10,6 +10,7 @@ import java.io.StringWriter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
 /**
@@ -127,6 +128,168 @@ class PhoneBillServletTest {
     servlet.doPost(postRequest, response);
 
     verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains("Invalid date/time format"));
+  }
+
+  @Test
+  void getWithInvalidDateReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn("bad-date");
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn("03/31/2026 11:59 PM");
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doGet(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains("Invalid date/time format"));
+  }
+
+  @Test
+  void postWithoutCallerNumberReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(CALLEE);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn(BEGIN);
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(END);
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doPost(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.CALLER_NUMBER_PARAMETER));
+  }
+
+  @Test
+  void postWithoutCustomerReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(CALLER);
+    when(request.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(CALLEE);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn(BEGIN);
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(END);
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doPost(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.CUSTOMER_PARAMETER));
+  }
+
+  @Test
+  void postWithoutCalleeNumberReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(CALLER);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn(BEGIN);
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(END);
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doPost(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.CALLEE_NUMBER_PARAMETER));
+  }
+
+  @Test
+  void postWithoutBeginReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(CALLER);
+    when(request.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(CALLEE);
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn(END);
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doPost(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.BEGIN_PARAMETER));
+  }
+
+  @Test
+  void postWithoutEndReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.CALLER_NUMBER_PARAMETER)).thenReturn(CALLER);
+    when(request.getParameter(PhoneBillServlet.CALLEE_NUMBER_PARAMETER)).thenReturn(CALLEE);
+    when(request.getParameter(PhoneBillServlet.BEGIN_PARAMETER)).thenReturn(BEGIN);
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doPost(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.END_PARAMETER));
+  }
+
+  @Test
+  void getWithOnlyEndReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    when(request.getParameter(PhoneBillServlet.END_PARAMETER)).thenReturn("03/31/2026 11:59 PM");
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doGet(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.BEGIN_PARAMETER));
+  }
+
+  @Test
+  void getWithEmptyCustomerReturnsPreconditionFailed() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn("");
+
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    servlet.doGet(request, response);
+
+    verify(response).sendError(eq(HttpServletResponse.SC_PRECONDITION_FAILED), contains(PhoneBillServlet.CUSTOMER_PARAMETER));
+  }
+
+  @Test
+  void getPhoneBillForUnknownCustomerReturnsEmptyList() {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    assertThat(servlet.getPhoneBill("Unknown"), equalTo(java.util.List.of()));
+  }
+
+  @Test
+  void deleteClearsAllPhoneBills() throws IOException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+    addCall(servlet, CUSTOMER, CALLER, CALLEE, BEGIN, END);
+
+    HttpServletResponse deleteResponse = mock(HttpServletResponse.class);
+    StringWriter deleteBody = new StringWriter();
+    when(deleteResponse.getWriter()).thenReturn(new PrintWriter(deleteBody, true));
+
+    servlet.doDelete(mock(HttpServletRequest.class), deleteResponse);
+
+    verify(deleteResponse).setStatus(HttpServletResponse.SC_OK);
+    assertThat(deleteBody.toString(), containsString(Messages.allPhoneBillsDeleted()));
+
+    HttpServletRequest getRequest = mock(HttpServletRequest.class);
+    when(getRequest.getParameter(PhoneBillServlet.CUSTOMER_PARAMETER)).thenReturn(CUSTOMER);
+    HttpServletResponse getResponse = mock(HttpServletResponse.class);
+    StringWriter getBody = new StringWriter();
+    when(getResponse.getWriter()).thenReturn(new PrintWriter(getBody, true));
+
+    servlet.doGet(getRequest, getResponse);
+
+    assertThat(getBody.toString(), equalTo(""));
   }
 
   private void addCall(PhoneBillServlet servlet, String customer, String caller, String callee, String begin, String end)

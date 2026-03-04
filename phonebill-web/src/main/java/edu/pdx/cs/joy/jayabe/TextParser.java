@@ -6,47 +6,29 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+/**
+ * Parses pipe-delimited text into {@link PhoneCallRecord} objects.
+ */
 public class TextParser {
   private final Reader reader;
 
+  /**
+   * Creates a parser that reads from the provided source.
+   *
+   * @param reader Source reader
+   */
   public TextParser(Reader reader) {
     this.reader = reader;
   }
 
-  public Map<String, String> parse() throws ParserException {
-    Pattern pattern = Pattern.compile("(.*) : (.*)");
-
-    Map<String, String> map = new HashMap<>();
-
-    try (
-      BufferedReader br = new BufferedReader(this.reader)
-    ) {
-
-      for (String line = br.readLine(); line != null; line = br.readLine()) {
-        Matcher matcher = pattern.matcher(line);
-        if (!matcher.find()) {
-          throw new ParserException("Unexpected text: " + line);
-        }
-
-        String word = matcher.group(1);
-        String definition = matcher.group(2);
-
-        map.put(word, definition);
-      }
-
-    } catch (IOException e) {
-      throw new ParserException("While parsing dictionary", e);
-    }
-
-    return map;
-  }
-
+  /**
+   * Parses all phone call lines from the source text.
+   *
+   * @return Parsed list of phone calls
+   * @throws ParserException If a line is malformed or an I/O error occurs
+   */
   public List<PhoneCallRecord> parsePhoneCalls() throws ParserException {
     List<PhoneCallRecord> calls = new ArrayList<>();
 
