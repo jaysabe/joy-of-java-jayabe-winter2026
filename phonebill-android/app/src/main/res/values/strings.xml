@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Phone Bill</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="caller_number">Caller Number (nnn-nnn-nnnn)</string>
+    <string name="callee_number">Callee Number (nnn-nnn-nnnn)</string>
+    <string name="begin_time">Begin (MM/dd/yyyy h:mm a)</string>
+    <string name="end_time">End (MM/dd/yyyy h:mm a)</string>
+    <string name="search_begin">Search Begin (MM/dd/yyyy h:mm a)</string>
+    <string name="search_end">Search End (MM/dd/yyyy h:mm a)</string>
+    <string name="add_call">Add Call</string>
+    <string name="show_pretty_bill">Show Pretty Bill</string>
+    <string name="search_calls">Search Calls</string>
+    <string name="results_title">Results</string>
+    <string name="help">Help</string>
+    <string name="readme">README</string>
+    <string name="ok">OK</string>
+    <string name="error_title">Error</string>
+    <string name="readme_title">Project README</string>
+    <string name="readme_text">Project 5: Android Phone Bill App\n\nThis app creates a phone bill for a customer, adds phone calls, pretty prints phone bills, and searches for calls between two times.\n\nRequired input formats:\n- Phone number: nnn-nnn-nnnn\n- Date/time: MM/dd/yyyy h:mm a\n  Example: 03/11/2026 9:15 PM\n\nData persistence:\nPhone bill data is saved to Android internal storage and survives app restarts.\n\nAuthor: Jay Abegglen</string>
+</resources>
